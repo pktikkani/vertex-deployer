@@ -7,6 +7,9 @@ param(
 
 $ErrorActionPreference = "Stop"
 
+# Convert to absolute path to ensure proper path calculations
+$SourceDir = (Resolve-Path $SourceDir).Path
+
 if (!(Test-Path $SourceDir)) {
     Write-Host "ERROR: Source directory not found: $SourceDir" -ForegroundColor Red
     exit 1
