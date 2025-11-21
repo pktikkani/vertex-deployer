@@ -53,10 +53,8 @@ jobs:
 
     - name: Install WiX Toolset
       run: |
-        Write-Host "Installing WiX Toolset..."
-        dotnet tool install --global wix --version 5.0.2
-        Write-Host "WiX installed successfully"
-      shell: pwsh
+        dotnet tool install --global wix
+        wix extension add -g WixToolset.UI.wixext
 
     - name: Generate WXS file
       run: |
@@ -73,10 +71,10 @@ jobs:
           New-Item -ItemType Directory -Path "bin" | Out-Null
         }
 
-        Write-Host "Building MSI with WiX UI extension v5.0.2..."
+        Write-Host "Building MSI with WiX UI extension..."
         wix build `
           -arch x64 `
-          -ext WixToolset.UI.wixext/5.0.2 `
+          -ext WixToolset.UI.wixext `
           Product.wxs `
           Generated.wxs `
           -out bin/VertexCentralDeployer.msi
