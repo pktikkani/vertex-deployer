@@ -123,7 +123,7 @@ namespace WSMDeployer.ViewModels
 
         public int SelectedUserCount => AvailableUsers.Count(u => u.IsSelected);
 
-        public string LoadUsersButtonText => IsLoadingUsers ? "Loading Users..." : "Load Non-Admin Users from Target";
+        public string LoadUsersButtonText => IsLoadingUsers ? "Loading Users..." : "Fetch Users from Target";
 
         public string AdminUsername
         {

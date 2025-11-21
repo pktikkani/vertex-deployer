@@ -61,7 +61,7 @@ jobs:
     - name: Install WiX UI Extension
       run: |
         Write-Host "Adding WiX UI extension..."
-        wix extension add WixToolset.UI.wixext --version 5.0.2
+        wix extension add WixToolset.UI.wixext
         Write-Host "WiX UI extension added successfully"
 
         Write-Host "`nInstalled extensions:"

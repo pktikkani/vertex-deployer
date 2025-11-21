@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("WSMDeployer")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Release")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+40ee27a81733ffeb256c622486afbc12031b7141")]
 [assembly: System.Reflection.AssemblyProductAttribute("WSMDeployer")]
 [assembly: System.Reflection.AssemblyTitleAttribute("WSMDeployer")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

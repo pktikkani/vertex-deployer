@@ -57,3 +57,4 @@ C:\Users\pavan\WSMDeployer\WSMDeployer\obj\Release\net8.0\win-x64\refint\WSMDepl
 C:\Users\pavan\WSMDeployer\WSMDeployer\obj\Release\net8.0\win-x64\WSMDeployer.pdb
 C:\Users\pavan\WSMDeployer\WSMDeployer\obj\Release\net8.0\win-x64\WSMDeployer.genruntimeconfig.cache
 C:\Users\pavan\WSMDeployer\WSMDeployer\obj\Release\net8.0\win-x64\ref\WSMDeployer.dll
+C:\Users\pavan\WSMDeployer\WSMDeployer\obj\Release\net8.0\win-x64\WSMDeployer.sourcelink.json
