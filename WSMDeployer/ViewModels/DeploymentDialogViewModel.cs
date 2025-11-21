@@ -23,6 +23,7 @@ namespace WSMDeployer.ViewModels
         private ObservableCollection<UserAccount> _availableUsers = new ObservableCollection<UserAccount>();
         private string _adminUsername = string.Empty;
         private string _adminPassword = string.Empty;
+        private ObservableCollection<string> _logMessages = new ObservableCollection<string>();
 
         public DeploymentDialogViewModel(DatabaseService db, Target target)
         {
@@ -149,6 +150,18 @@ namespace WSMDeployer.ViewModels
                     ((RelayCommand)LoadUsersCommand).RaiseCanExecuteChanged();
                 }
             }
+        }
+
+        public ObservableCollection<string> LogMessages
+        {
+            get => _logMessages;
+            set => SetProperty(ref _logMessages, value);
+        }
+
+        private void AddLog(string message)
+        {
+            var timestamp = DateTime.Now.ToString("HH:mm:ss");
+            LogMessages.Insert(0, $"[{timestamp}] {message}");
         }
 
         // Commands
@@ -302,17 +315,23 @@ namespace WSMDeployer.ViewModels
         {
             IsLoadingUsers = true;
             StatusMessage = "Loading users from target machine...";
+            AddLog($"Loading users from {_target.Hostname}...");
+            AddLog($"Using credentials: {AdminUsername}");
 
             try
             {
                 var userService = new UserManagementService();
 
                 // Load users in background using provided credentials
+                AddLog("Connecting to target via WMI...");
                 var users = await userService.GetNonAdminUsers(_target, AdminUsername, AdminPassword);
+
+                AddLog($"Successfully retrieved {users.Count} non-admin user(s)");
 
                 AvailableUsers.Clear();
                 foreach (var user in users)
                 {
+                    AddLog($"  - {user.DisplayName} (Enabled: {user.IsEnabled})");
                     user.PropertyChanged += (s, e) =>
                     {
                         if (e.PropertyName == nameof(UserAccount.IsSelected))
@@ -331,10 +350,12 @@ namespace WSMDeployer.ViewModels
                 if (users.Count == 0)
                 {
                     StatusMessage = "No non-admin users found on target machine";
+                    AddLog("WARNING: No non-admin users found on target machine");
                 }
                 else
                 {
                     StatusMessage = $"Found {users.Count} non-admin user(s)";
+                    AddLog($"SUCCESS: Loaded {users.Count} user(s) successfully");
                 }
 
                 // Clear status after a delay
@@ -344,6 +365,8 @@ namespace WSMDeployer.ViewModels
             catch (Exception ex)
             {
                 StatusMessage = $"Failed to load users: {ex.Message}";
+                AddLog($"ERROR: Failed to load users - {ex.Message}");
+                AddLog($"Stack trace: {ex.StackTrace}");
                 await System.Threading.Tasks.Task.Delay(3000);
                 StatusMessage = string.Empty;
             }

@@ -261,6 +261,35 @@
                         </StackPanel>
                     </StackPanel>
                 </Border>
+
+                <!-- Log Viewer -->
+                <Border Classes="card" IsVisible="{Binding LogMessages.Count}">
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="📋 Activity Log" Classes="heading3" FontSize="14"/>
+                        <Separator Background="{DynamicResource BorderBrush}"/>
+
+                        <Border Background="{DynamicResource AppBackground2}"
+                                BorderBrush="{DynamicResource BorderBrush}"
+                                BorderThickness="1"
+                                CornerRadius="4"
+                                MaxHeight="150">
+                            <ScrollViewer>
+                                <ItemsControl ItemsSource="{Binding LogMessages}">
+                                    <ItemsControl.ItemTemplate>
+                                        <DataTemplate>
+                                            <TextBlock Text="{Binding}"
+                                                       FontFamily="Consolas,Courier New"
+                                                       FontSize="11"
+                                                       Foreground="{DynamicResource TextSecondary}"
+                                                       Padding="8,4"
+                                                       TextWrapping="Wrap"/>
+                                        </DataTemplate>
+                                    </ItemsControl.ItemTemplate>
+                                </ItemsControl>
+                            </ScrollViewer>
+                        </Border>
+                    </StackPanel>
+                </Border>
             </StackPanel>
         </ScrollViewer>
 
