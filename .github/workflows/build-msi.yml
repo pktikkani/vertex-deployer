@@ -60,14 +60,12 @@ jobs:
 
     - name: Install WiX UI Extension
       run: |
-        cd ${{ env.INSTALLER_PATH }}
-        Write-Host "Installing WiX UI extension via NuGet..."
-        nuget install WixToolset.UI.wixext -Version 5.0.2 -OutputDirectory packages
+        Write-Host "Adding WiX UI extension..."
+        wix extension add WixToolset.UI.wixext --version 5.0.2
+        Write-Host "WiX UI extension added successfully"
 
-        Write-Host "`nPackage contents:"
-        Get-ChildItem -Path packages -Recurse | Select-Object FullName
-
-        Write-Host "WiX UI extension installed"
+        Write-Host "`nInstalled extensions:"
+        wix extension list
       shell: pwsh
 
     - name: Generate WXS file
@@ -85,28 +83,20 @@ jobs:
           New-Item -ItemType Directory -Path "bin" | Out-Null
         }
 
-        # Find UI extension DLL - try multiple patterns
-        Write-Host "Searching for WiX UI extension DLL..."
-        $uiExtPath = $null
-
-        # Try pattern 1: wixext subdirectory (WiX v5 default)
-        $uiExtPath = Get-ChildItem -Path "packages" -Filter "WixToolset.UI.wixext.dll" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
-
-        if (-not $uiExtPath) {
-          Write-Host "Extension DLL not found! Package structure:"
-          Get-ChildItem -Path "packages" -Recurse -File | Where-Object { $_.Extension -eq ".dll" } | Select-Object FullName
-          throw "Could not find WixToolset.UI.wixext.dll in packages directory"
-        }
-
-        Write-Host "UI Extension path: $uiExtPath"
-
-        # Build MSI
+        Write-Host "Building MSI with WiX UI extension..."
         wix build `
           -arch x64 `
-          -ext "$uiExtPath" `
+          -ext WixToolset.UI.wixext `
           Product.wxs `
           Generated.wxs `
           -out bin/VertexCentralDeployer.msi
+
+        if ($LASTEXITCODE -eq 0) {
+          Write-Host "MSI built successfully!"
+        }
+        else {
+          throw "MSI build failed with exit code: $LASTEXITCODE"
+        }
       shell: pwsh
 
     - name: Verify MSI created
