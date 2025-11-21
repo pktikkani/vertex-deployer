@@ -55,11 +55,13 @@ jobs:
       run: |
         Write-Host "Installing WiX Toolset..."
         dotnet tool install --global wix --version 5.0.2
-        dotnet tool install --global WixToolset.Heat --version 5.0.2
         Write-Host "WiX installed successfully"
+      shell: pwsh
 
-        Write-Host "Installing WiX UI extension..."
-        wix extension add WixToolset.UI.wixext/5.0.2
+    - name: Install WiX UI Extension
+      run: |
+        Write-Host "Installing WiX UI extension via NuGet..."
+        nuget install WixToolset.UI.wixext -Version 5.0.2 -OutputDirectory ${{ env.INSTALLER_PATH }}/packages
         Write-Host "WiX UI extension installed"
       shell: pwsh
 
@@ -72,9 +74,20 @@ jobs:
     - name: Build MSI
       run: |
         cd ${{ env.INSTALLER_PATH }}
+
+        # Create bin directory if it doesn't exist
+        if (-not (Test-Path "bin")) {
+          New-Item -ItemType Directory -Path "bin" | Out-Null
+        }
+
+        # Find UI extension DLL
+        $uiExtPath = (Get-ChildItem -Path "packages/WixToolset.UI.wixext.*/tools/net6.0/WixToolset.UI.wixext.dll" -Recurse | Select-Object -First 1).FullName
+        Write-Host "UI Extension path: $uiExtPath"
+
+        # Build MSI
         wix build `
           -arch x64 `
-          -ext WixToolset.UI.wixext `
+          -ext $uiExtPath `
           Product.wxs `
           Generated.wxs `
           -out bin/VertexCentralDeployer.msi
