@@ -75,6 +75,7 @@ jobs:
         wix build `
           -arch x64 `
           -ext WixToolset.UI.wixext `
+          -d DeployerDir="../WSMDeployer/bin/Release/net8.0/win-x64/publish" `
           Product.wxs `
           Generated.wxs `
           -out bin/VertexCentralDeployer.msi
