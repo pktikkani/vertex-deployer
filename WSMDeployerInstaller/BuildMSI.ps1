@@ -106,6 +106,7 @@ try {
         "-ext", "WixToolset.UI.wixext"
         "-ext", "WixToolset.Util.wixext"
         "-out", "$binDir\VertexCentralDeployer.msi"
+        "$scriptDir\Product.wxs"
         "$scriptDir\Generated.wxs"
         "-d", "DeployerDir=$publishDir"
         "-v"

@@ -23,20 +23,40 @@ namespace WSMDeployer.Services
 
                 try
                 {
-                    // Setup WMI connection
-                    var options = new ConnectionOptions
-                    {
-                        Username = username,
-                        Password = password,
-                        Impersonation = ImpersonationLevel.Impersonate,
-                        Authentication = AuthenticationLevel.PacketPrivacy
-                    };
+                    // Check if this is a local connection
+                    var isLocal = target.Hostname.Equals(Environment.MachineName, StringComparison.OrdinalIgnoreCase) ||
+                                  target.Hostname.Equals("localhost", StringComparison.OrdinalIgnoreCase) ||
+                                  target.Hostname.Equals("127.0.0.1") ||
+                                  target.Hostname.Equals(".");
 
-                    var scope = new ManagementScope($"\\\\{target.Hostname}\\root\\cimv2", options);
-                    scope.Connect();
+                    ManagementScope scope;
+
+                    if (isLocal)
+                    {
+                        // Local connection - don't use credentials
+                        System.Diagnostics.Debug.WriteLine("Local connection detected - using current user context");
+                        scope = new ManagementScope($"\\\\{target.Hostname}\\root\\cimv2");
+                        scope.Connect();
+                    }
+                    else
+                    {
+                        // Remote connection - use provided credentials
+                        System.Diagnostics.Debug.WriteLine($"Remote connection to {target.Hostname} - using credentials: {username}");
+                        var options = new ConnectionOptions
+                        {
+                            Username = username,
+                            Password = password,
+                            Impersonation = ImpersonationLevel.Impersonate,
+                            Authentication = AuthenticationLevel.PacketPrivacy
+                        };
+
+                        scope = new ManagementScope($"\\\\{target.Hostname}\\root\\cimv2", options);
+                        scope.Connect();
+                    }
 
                     if (!scope.IsConnected)
                     {
+                        System.Diagnostics.Debug.WriteLine("WMI connection failed");
                         return users;
                     }
 
@@ -45,32 +65,35 @@ namespace WSMDeployer.Services
                     using (var searcher = new ManagementObjectSearcher(scope, query))
                     using (var results = searcher.Get())
                     {
+                        var totalUsers = 0;
                         foreach (ManagementObject user in results)
                         {
+                            totalUsers++;
                             var userName = user["Name"]?.ToString() ?? string.Empty;
                             var sid = user["SID"]?.ToString() ?? string.Empty;
                             var fullName = user["FullName"]?.ToString() ?? string.Empty;
                             var description = user["Description"]?.ToString() ?? string.Empty;
                             var disabled = user["Disabled"] != null && (bool)user["Disabled"];
 
+                            System.Diagnostics.Debug.WriteLine($"Found user: {userName}, Disabled: {disabled}");
+
                             // Check if user is an administrator
                             bool isAdmin = IsUserAdministrator(scope, userName);
+                            System.Diagnostics.Debug.WriteLine($"  IsAdmin: {isAdmin}");
 
-                            // Only include non-admin, enabled users
-                            if (!isAdmin && !disabled)
+                            // Include ALL users for now - let UI decide filtering
+                            users.Add(new UserAccount
                             {
-                                users.Add(new UserAccount
-                                {
-                                    Username = userName,
-                                    FullName = fullName,
-                                    SID = sid,
-                                    Description = description,
-                                    IsAdmin = false,
-                                    IsEnabled = true,
-                                    IsSelected = false
-                                });
-                            }
+                                Username = userName,
+                                FullName = fullName,
+                                SID = sid,
+                                Description = description,
+                                IsAdmin = isAdmin,
+                                IsEnabled = !disabled,
+                                IsSelected = false
+                            });
                         }
+                        System.Diagnostics.Debug.WriteLine($"Total local users found: {totalUsers}, After filtering: {users.Count}");
                     }
                 }
                 catch (Exception ex)

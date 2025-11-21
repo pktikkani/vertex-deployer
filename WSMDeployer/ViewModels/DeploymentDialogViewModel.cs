@@ -324,14 +324,35 @@ namespace WSMDeployer.ViewModels
 
                 // Load users in background using provided credentials
                 AddLog("Connecting to target via WMI...");
-                var users = await userService.GetNonAdminUsers(_target, AdminUsername, AdminPassword);
+                var allUsers = await userService.GetNonAdminUsers(_target, AdminUsername, AdminPassword);
 
-                AddLog($"Successfully retrieved {users.Count} non-admin user(s)");
+                AddLog($"Retrieved {allUsers.Count} total local user(s) from target");
 
                 AvailableUsers.Clear();
-                foreach (var user in users)
+                var filteredCount = 0;
+                var adminCount = 0;
+                var disabledCount = 0;
+
+                foreach (var user in allUsers)
                 {
-                    AddLog($"  - {user.DisplayName} (Enabled: {user.IsEnabled})");
+                    // Filter out admins and disabled users
+                    if (user.IsAdmin)
+                    {
+                        AddLog($"  ✗ {user.DisplayName} - SKIPPED (Administrator)");
+                        adminCount++;
+                        continue;
+                    }
+                    if (!user.IsEnabled)
+                    {
+                        AddLog($"  ✗ {user.DisplayName} - SKIPPED (Disabled)");
+                        disabledCount++;
+                        continue;
+                    }
+
+                    // Include this user
+                    AddLog($"  ✓ {user.DisplayName} - Available for deployment");
+                    filteredCount++;
+
                     user.PropertyChanged += (s, e) =>
                     {
                         if (e.PropertyName == nameof(UserAccount.IsSelected))
@@ -343,19 +364,21 @@ namespace WSMDeployer.ViewModels
                     AvailableUsers.Add(user);
                 }
 
+                AddLog($"Summary: {filteredCount} available, {adminCount} admin, {disabledCount} disabled");
+
                 OnPropertyChanged(nameof(HasUsers));
                 OnPropertyChanged(nameof(SelectedUserCount));
                 ((RelayCommand)DeployCommand).RaiseCanExecuteChanged();
 
-                if (users.Count == 0)
+                if (filteredCount == 0)
                 {
                     StatusMessage = "No non-admin users found on target machine";
-                    AddLog("WARNING: No non-admin users found on target machine");
+                    AddLog("WARNING: No eligible users found for deployment");
                 }
                 else
                 {
-                    StatusMessage = $"Found {users.Count} non-admin user(s)";
-                    AddLog($"SUCCESS: Loaded {users.Count} user(s) successfully");
+                    StatusMessage = $"Found {filteredCount} non-admin user(s)";
+                    AddLog($"SUCCESS: Loaded {filteredCount} user(s) successfully");
                 }
 
                 // Clear status after a delay

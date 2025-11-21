@@ -14,9 +14,6 @@
 
     <MediaTemplate EmbedCab="yes" />
 
-    <!-- Require Administrator -->
-    <Property Id="ALLUSERS" Value="1" />
-
     <!-- UI Configuration -->
     <ui:WixUI Id="WixUI_InstallDir" />
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
