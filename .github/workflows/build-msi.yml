@@ -55,6 +55,7 @@ jobs:
       run: |
         dotnet tool install --global wix
         wix extension add -g WixToolset.UI.wixext
+        wix extension add -g WixToolset.Util.wixext
 
     - name: Generate WXS file
       run: |
@@ -71,10 +72,11 @@ jobs:
           New-Item -ItemType Directory -Path "bin" | Out-Null
         }
 
-        Write-Host "Building MSI with WiX UI extension..."
+        Write-Host "Building MSI with WiX extensions..."
         wix build `
           -arch x64 `
           -ext WixToolset.UI.wixext `
+          -ext WixToolset.Util.wixext `
           -d DeployerDir="../WSMDeployer/bin/Release/net8.0/win-x64/publish" `
           Product.wxs `
           Generated.wxs `
