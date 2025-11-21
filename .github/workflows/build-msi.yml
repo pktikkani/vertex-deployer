@@ -60,8 +60,13 @@ jobs:
 
     - name: Install WiX UI Extension
       run: |
+        cd ${{ env.INSTALLER_PATH }}
         Write-Host "Installing WiX UI extension via NuGet..."
-        nuget install WixToolset.UI.wixext -Version 5.0.2 -OutputDirectory ${{ env.INSTALLER_PATH }}/packages
+        nuget install WixToolset.UI.wixext -Version 5.0.2 -OutputDirectory packages
+
+        Write-Host "`nPackage contents:"
+        Get-ChildItem -Path packages -Recurse | Select-Object FullName
+
         Write-Host "WiX UI extension installed"
       shell: pwsh
 
@@ -80,14 +85,25 @@ jobs:
           New-Item -ItemType Directory -Path "bin" | Out-Null
         }
 
-        # Find UI extension DLL
-        $uiExtPath = (Get-ChildItem -Path "packages/WixToolset.UI.wixext.*/tools/net6.0/WixToolset.UI.wixext.dll" -Recurse | Select-Object -First 1).FullName
+        # Find UI extension DLL - try multiple patterns
+        Write-Host "Searching for WiX UI extension DLL..."
+        $uiExtPath = $null
+
+        # Try pattern 1: wixext subdirectory (WiX v5 default)
+        $uiExtPath = Get-ChildItem -Path "packages" -Filter "WixToolset.UI.wixext.dll" -Recurse -ErrorAction SilentlyContinue | Select-Object -First 1 -ExpandProperty FullName
+
+        if (-not $uiExtPath) {
+          Write-Host "Extension DLL not found! Package structure:"
+          Get-ChildItem -Path "packages" -Recurse -File | Where-Object { $_.Extension -eq ".dll" } | Select-Object FullName
+          throw "Could not find WixToolset.UI.wixext.dll in packages directory"
+        }
+
         Write-Host "UI Extension path: $uiExtPath"
 
         # Build MSI
         wix build `
           -arch x64 `
-          -ext $uiExtPath `
+          -ext "$uiExtPath" `
           Product.wxs `
           Generated.wxs `
           -out bin/VertexCentralDeployer.msi
