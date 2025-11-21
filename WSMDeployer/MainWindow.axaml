@@ -76,6 +76,16 @@
                             <TextBlock Text="Deployments" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
+
+                    <Button Classes="nav-item"
+                            Classes.selected="{Binding SelectedPage, Converter={x:Static ObjectConverters.Equal}, ConverterParameter=Logs}"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="Logs">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock Text="📋" FontSize="18" />
+                            <TextBlock Text="Logs" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
 
                 <!-- Theme Selector & Version Info at bottom -->
@@ -133,6 +143,11 @@
                         <!-- Deployments Template -->
                         <DataTemplate DataType="vm:DeploymentsViewModel">
                             <views:DeploymentsView />
+                        </DataTemplate>
+
+                        <!-- Logs Template -->
+                        <DataTemplate DataType="vm:LogsPageViewModel">
+                            <views:LogsPage />
                         </DataTemplate>
                     </ContentControl.DataTemplates>
                 </ContentControl>

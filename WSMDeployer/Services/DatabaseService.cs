@@ -426,8 +426,15 @@ namespace WSMDeployer.Services
             connection.Open();
 
             var query = targetId == 0
-                ? "SELECT * FROM Deployments ORDER BY CreatedDate DESC"
-                : "SELECT * FROM Deployments WHERE TargetId = @TargetId ORDER BY CreatedDate DESC";
+                ? @"SELECT d.*, t.Hostname
+                    FROM Deployments d
+                    LEFT JOIN Targets t ON d.TargetId = t.Id
+                    ORDER BY d.CreatedDate DESC"
+                : @"SELECT d.*, t.Hostname
+                    FROM Deployments d
+                    LEFT JOIN Targets t ON d.TargetId = t.Id
+                    WHERE d.TargetId = @TargetId
+                    ORDER BY d.CreatedDate DESC";
 
             using var command = connection.CreateCommand();
             command.CommandText = query;
@@ -443,6 +450,27 @@ namespace WSMDeployer.Services
             return deployments;
         }
 
+        /// <summary>
+        /// Get all deployments from database
+        /// </summary>
+        public List<Deployment> GetAllDeployments()
+        {
+            return GetDeploymentsForTarget(0); // 0 means all targets
+        }
+
+        /// <summary>
+        /// Clear all deployment history
+        /// </summary>
+        public void ClearDeploymentHistory()
+        {
+            using var connection = new SqliteConnection(_connectionString);
+            connection.Open();
+
+            using var command = connection.CreateCommand();
+            command.CommandText = "DELETE FROM Deployments";
+            command.ExecuteNonQuery();
+        }
+
         private Deployment MapDeployment(SqliteDataReader reader)
         {
             return new Deployment
@@ -456,7 +484,8 @@ namespace WSMDeployer.Services
                 ErrorMessage = reader.IsDBNull(6) ? null : reader.GetString(6),
                 Log = reader.IsDBNull(7) ? null : reader.GetString(7),
                 ConfigurationTemplateId = reader.IsDBNull(8) ? null : reader.GetInt32(8),
-                CreatedDate = DateTime.Parse(reader.GetString(9))
+                CreatedDate = DateTime.Parse(reader.GetString(9)),
+                TargetHostname = reader.IsDBNull(10) ? "Unknown" : reader.GetString(10)
             };
         }
 

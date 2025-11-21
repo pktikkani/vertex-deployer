@@ -28,6 +28,7 @@ namespace WSMDeployer.ViewModels
             DashboardViewModel = new DashboardViewModel(_databaseService);
             TargetsViewModel = new TargetsViewModel(_databaseService);
             DeploymentsViewModel = new DeploymentsViewModel(_databaseService);
+            LogsPageViewModel = new LogsPageViewModel(_databaseService);
 
             // Set initial page
             _currentPage = DashboardViewModel;
@@ -53,6 +54,7 @@ namespace WSMDeployer.ViewModels
         public DashboardViewModel DashboardViewModel { get; }
         public TargetsViewModel TargetsViewModel { get; }
         public DeploymentsViewModel DeploymentsViewModel { get; }
+        public LogsPageViewModel LogsPageViewModel { get; }
 
         // Current displayed page
         public ViewModelBase CurrentPage
@@ -103,6 +105,7 @@ namespace WSMDeployer.ViewModels
                 "Dashboard" => DashboardViewModel,
                 "Targets" => TargetsViewModel,
                 "Deployments" => DeploymentsViewModel,
+                "Logs" => LogsPageViewModel,
                 _ => DashboardViewModel
             };
         }

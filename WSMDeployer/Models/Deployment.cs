@@ -15,11 +15,16 @@ namespace WSMDeployer.Models
         public int? ConfigurationTemplateId { get; set; }
         public DateTime CreatedDate { get; set; }
 
+        // Additional properties for display
+        public string TargetHostname { get; set; } = string.Empty;
+
         // Navigation properties
         public Target? Target { get; set; }
         public ConfigurationTemplate? ConfigurationTemplate { get; set; }
 
         // Computed properties
+        public string? Output => Log; // Alias for compatibility
+
         public TimeSpan? Duration => EndTime.HasValue && StartTime.HasValue
             ? EndTime.Value - StartTime.Value
             : null;

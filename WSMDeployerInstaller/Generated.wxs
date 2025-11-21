@@ -1,280 +1,144 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
-<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
-     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui"
-     xmlns:util="http://wixtoolset.org/schemas/v4/wxs/util">
-
-  <Package Name="Vertex Central Deployer"
-           Version="1.0.0.0"
-           Manufacturer="Vertex Security"
-           UpgradeCode="a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d"
-           Compressed="yes"
-           InstallerVersion="500"
-           Scope="perMachine">
-
-    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
-    <MediaTemplate EmbedCab="yes" />
-
-    <!-- UI Configuration -->
-    <ui:WixUI Id="WixUI_InstallDir" />
-    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
-    <WixVariable Id="WixUILicenseRtf" Value="C:\Users\pavan\WSMDeployer\WSMDeployerInstaller\License.rtf" />
-
-    <!-- Close running applications before uninstall -->
-    <util:CloseApplication Id="CloseDeployer" Target="WSMDeployer.exe"
-                           CloseMessage="yes" RebootPrompt="no" />
-
-    <!-- Features -->
-    <Feature Id="MainFeature" Title="Vertex Central Deployer" Level="1">
-      <ComponentGroupRef Id="AllFiles" />
-      <ComponentRef Id="StartMenuShortcut" />
-      <ComponentRef Id="DesktopShortcut" />
-      <ComponentRef Id="DataFolderComponent" />
-      <ComponentRef Id="DatabaseFolderComponent" />
-      <ComponentRef Id="LogsFolderComponent" />
-    </Feature>
-
-    <!-- Standard Directories -->
-    <StandardDirectory Id="ProgramFiles64Folder">
-      <Directory Id="INSTALLFOLDER" Name="VertexDeployer" />
-    </StandardDirectory>
-
-    <StandardDirectory Id="ProgramMenuFolder">
-      <Directory Id="ApplicationProgramsFolder" Name="Vertex Central Deployer" />
-    </StandardDirectory>
-
-    <StandardDirectory Id="DesktopFolder">
-      <Directory Id="DesktopShortcutFolder" />
-    </StandardDirectory>
-
-    <StandardDirectory Id="CommonAppDataFolder">
-      <Directory Id="DeployerDataFolder" Name="VertexDeployer">
-        <Directory Id="DatabaseFolder" Name="Database" />
-        <Directory Id="LogsFolder" Name="Logs" />
-      </Directory>
-    </StandardDirectory>
-
-  </Package>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
 
   <Fragment>
     <ComponentGroup Id="AllFiles" Directory="INSTALLFOLDER">
-      <Component Id="Cmp_Avalonia_Base_1" Guid="7d7797bd-92aa-4878-96bc-ea7f1fcb4c53">
+      <Component Id="Cmp_Avalonia_Base_1" Guid="a58f88c1-de93-41c8-a34e-fe84fab2f3e9">
         <File Source="$(var.DeployerDir)\Avalonia.Base.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_Controls_ColorPicker_2" Guid="6c2aeaef-0848-4b71-a77d-01492e8074e4">
+      <Component Id="Cmp_Avalonia_Controls_ColorPicker_2" Guid="14331d9d-a727-4abd-aec8-b4e1d939c84c">
         <File Source="$(var.DeployerDir)\Avalonia.Controls.ColorPicker.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_Controls_DataGrid_3" Guid="feea2ce3-e91d-44fa-9c88-6e4dbe99b989">
+      <Component Id="Cmp_Avalonia_Controls_DataGrid_3" Guid="2b43bd46-26e1-48a8-9b0c-7c734c2a81ba">
         <File Source="$(var.DeployerDir)\Avalonia.Controls.DataGrid.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_Controls_4" Guid="775e6cf8-ef16-483e-bcfa-4ab5557425fe">
+      <Component Id="Cmp_Avalonia_Controls_4" Guid="4e778928-ca84-4a60-a5c7-f949ddbec97a">
         <File Source="$(var.DeployerDir)\Avalonia.Controls.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_DesignerSupport_5" Guid="f614ae75-6e71-487c-897c-70c998057efe">
+      <Component Id="Cmp_Avalonia_DesignerSupport_5" Guid="e1b29002-d737-4f8a-8da2-2a0b6dee4bd0">
         <File Source="$(var.DeployerDir)\Avalonia.DesignerSupport.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_Desktop_6" Guid="6b6cf1cc-45d7-4fbe-9b08-1db43c7c3e0d">
+      <Component Id="Cmp_Avalonia_Desktop_6" Guid="8a4eae6f-d0a2-4bb8-a208-c2657dcdf6b5">
         <File Source="$(var.DeployerDir)\Avalonia.Desktop.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_Dialogs_7" Guid="1cbeaa0f-d775-4b75-af4c-213c65f78edb">
+      <Component Id="Cmp_Avalonia_Dialogs_7" Guid="4ba9711f-90de-40bc-89ad-dbf97c3fa837">
         <File Source="$(var.DeployerDir)\Avalonia.Dialogs.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_8" Guid="3b5ed897-1b2b-4540-8cb4-b7f316079fd3">
+      <Component Id="Cmp_Avalonia_8" Guid="b36d84f3-bab6-44c3-a1f2-48de98a873eb">
         <File Source="$(var.DeployerDir)\Avalonia.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_Fonts_Inter_9" Guid="83f1bdd7-36c7-477f-bb85-89d36f86fa77">
+      <Component Id="Cmp_Avalonia_Fonts_Inter_9" Guid="18590a78-8dc8-4e0e-a522-c90e495ff633">
         <File Source="$(var.DeployerDir)\Avalonia.Fonts.Inter.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_FreeDesktop_10" Guid="6ac7933c-3977-4583-aff8-be211a3dc4c1">
+      <Component Id="Cmp_Avalonia_FreeDesktop_10" Guid="ae8aa0cb-3d29-4989-af9b-351035131f19">
         <File Source="$(var.DeployerDir)\Avalonia.FreeDesktop.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_Markup_11" Guid="d873dd7f-aab2-4cfe-9ad8-9c0940c09965">
+      <Component Id="Cmp_Avalonia_Markup_11" Guid="53cfe02d-336a-453e-bbe2-3a68b076f56a">
         <File Source="$(var.DeployerDir)\Avalonia.Markup.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_Markup_Xaml_12" Guid="7957fbfe-cd2a-46c7-95e7-c8be4baa4072">
+      <Component Id="Cmp_Avalonia_Markup_Xaml_12" Guid="976037c1-a53c-4935-95cb-d779eb0c55dc">
         <File Source="$(var.DeployerDir)\Avalonia.Markup.Xaml.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_Metal_13" Guid="b6efe8c5-87b8-4a0b-b132-a3c6fe6af53b">
+      <Component Id="Cmp_Avalonia_Metal_13" Guid="8380319e-ea56-4701-88f8-d79bbf12a336">
         <File Source="$(var.DeployerDir)\Avalonia.Metal.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_MicroCom_14" Guid="e3918e93-dfea-49c2-bff3-6844fd53a1ac">
+      <Component Id="Cmp_Avalonia_MicroCom_14" Guid="e07a68f1-5a70-4648-8664-7cfab7cec120">
         <File Source="$(var.DeployerDir)\Avalonia.MicroCom.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_Native_15" Guid="1c8360ba-6cd4-4d0f-8894-be6ab5b427a8">
+      <Component Id="Cmp_Avalonia_Native_15" Guid="0b0551bd-087d-482f-9d46-79167bd2c17b">
         <File Source="$(var.DeployerDir)\Avalonia.Native.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_OpenGL_16" Guid="eaa96b43-5747-4472-8926-274212a03294">
+      <Component Id="Cmp_Avalonia_OpenGL_16" Guid="ff9796df-8223-4a36-84d1-8aa3f8508544">
         <File Source="$(var.DeployerDir)\Avalonia.OpenGL.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_Remote_Protocol_17" Guid="e1c37edf-0154-4516-a5ea-b9ed8d5ce7fd">
+      <Component Id="Cmp_Avalonia_Remote_Protocol_17" Guid="b1030503-768f-477b-88b9-7fdcf28d13f9">
         <File Source="$(var.DeployerDir)\Avalonia.Remote.Protocol.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_Skia_18" Guid="958e7cdf-27a5-4ef9-8626-b68063ced43b">
+      <Component Id="Cmp_Avalonia_Skia_18" Guid="e6f5c713-59d4-4628-945c-5ed3c47f5e89">
         <File Source="$(var.DeployerDir)\Avalonia.Skia.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_Themes_Fluent_19" Guid="70b540ab-b908-4bc2-86e1-c0f4c683f46e">
+      <Component Id="Cmp_Avalonia_Themes_Fluent_19" Guid="fd14545e-9d31-4eed-bce3-def1ac9d0767">
         <File Source="$(var.DeployerDir)\Avalonia.Themes.Fluent.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_Vulkan_20" Guid="2bbcad8f-2540-465b-a499-3115a2887e68">
+      <Component Id="Cmp_Avalonia_Vulkan_20" Guid="ce9120a3-7121-47ba-b09c-09e9776c59b5">
         <File Source="$(var.DeployerDir)\Avalonia.Vulkan.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_Win32_Automation_21" Guid="a3b33c90-4683-43e6-860f-3853a18c1ea4">
+      <Component Id="Cmp_Avalonia_Win32_Automation_21" Guid="fb118422-56fa-42c1-a45f-1e26edb3066c">
         <File Source="$(var.DeployerDir)\Avalonia.Win32.Automation.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_Win32_22" Guid="84bca1a9-8744-40b1-8876-4569298e19ab">
+      <Component Id="Cmp_Avalonia_Win32_22" Guid="3a252c97-deb1-46c4-88dd-d226e9f66565">
         <File Source="$(var.DeployerDir)\Avalonia.Win32.dll" />
       </Component>
-      <Component Id="Cmp_Avalonia_X11_23" Guid="b0395f0f-2be4-4045-95ec-0c9f4030ea05">
+      <Component Id="Cmp_Avalonia_X11_23" Guid="5a41f58b-5c23-4872-9edc-a2ee9b8b9b9e">
         <File Source="$(var.DeployerDir)\Avalonia.X11.dll" />
       </Component>
-      <Component Id="Cmp_av_libglesv2_24" Guid="faf2ad3a-72e6-4d72-a55d-578c4915f70d">
+      <Component Id="Cmp_av_libglesv2_24" Guid="54822c76-59f6-48e1-8552-16b355b59723">
         <File Source="$(var.DeployerDir)\av_libglesv2.dll" />
       </Component>
-      <Component Id="Cmp_e_sqlite3_25" Guid="fb5035c9-03c6-4a25-929f-72b5ddb19b27">
+      <Component Id="Cmp_e_sqlite3_25" Guid="bc3cbb14-c624-4ab2-8f70-2fbcdf0b5bf5">
         <File Source="$(var.DeployerDir)\e_sqlite3.dll" />
       </Component>
-      <Component Id="Cmp_FluentAvalonia_26" Guid="b1b5ccaa-08c0-4961-9618-45b1dd5925c7">
+      <Component Id="Cmp_FluentAvalonia_26" Guid="4005be22-2fb0-41bc-9736-d768ad56859c">
         <File Source="$(var.DeployerDir)\FluentAvalonia.dll" />
       </Component>
-      <Component Id="Cmp_HarfBuzzSharp_27" Guid="cbc85f08-566e-4829-a169-9d55e0e20dc1">
+      <Component Id="Cmp_HarfBuzzSharp_27" Guid="49c8035e-4301-41f5-b8d2-1d5a6e54b42f">
         <File Source="$(var.DeployerDir)\HarfBuzzSharp.dll" />
       </Component>
-      <Component Id="Cmp_libHarfBuzzSharp_28" Guid="4a2fa3ff-e9dc-441b-ad86-8eac8b47e1ce">
+      <Component Id="Cmp_libHarfBuzzSharp_28" Guid="e5577827-f2ba-42d6-958d-41b8f84ec1f1">
         <File Source="$(var.DeployerDir)\libHarfBuzzSharp.dll" />
       </Component>
-      <Component Id="Cmp_libSkiaSharp_29" Guid="98297a4d-0d5b-4053-8c1b-13d35c5d1c5a">
+      <Component Id="Cmp_libSkiaSharp_29" Guid="72f86109-4fba-4a09-a061-ae49848813f2">
         <File Source="$(var.DeployerDir)\libSkiaSharp.dll" />
       </Component>
-      <Component Id="Cmp_MicroCom_Runtime_30" Guid="26275cbd-1454-4034-9043-08176dd1a5a9">
+      <Component Id="Cmp_MicroCom_Runtime_30" Guid="a6d3d0f8-de43-4479-b722-6b7adc2e4cf6">
         <File Source="$(var.DeployerDir)\MicroCom.Runtime.dll" />
       </Component>
-      <Component Id="Cmp_Microsoft_Data_Sqlite_31" Guid="f987c359-b8f9-46b7-84a5-1954bd3af4bc">
+      <Component Id="Cmp_Microsoft_Data_Sqlite_31" Guid="f9c5944e-3153-4f5b-a18c-66ca9aa4a393">
         <File Source="$(var.DeployerDir)\Microsoft.Data.Sqlite.dll" />
       </Component>
-      <Component Id="Cmp_Newtonsoft_Json_32" Guid="c2227d47-a48c-468e-b0f7-82b69d20af14">
+      <Component Id="Cmp_Newtonsoft_Json_32" Guid="c1462658-ba0a-40d3-a579-8b2f38a16591">
         <File Source="$(var.DeployerDir)\Newtonsoft.Json.dll" />
       </Component>
-      <Component Id="Cmp_SkiaSharp_33" Guid="35e39921-8846-4d65-aa46-b24cf55512bb">
+      <Component Id="Cmp_SkiaSharp_33" Guid="e90c5f53-a517-4807-93a2-8e3a64ce51e7">
         <File Source="$(var.DeployerDir)\SkiaSharp.dll" />
       </Component>
-      <Component Id="Cmp_SQLitePCLRaw_batteries_v2_34" Guid="4a17fcd2-5dcf-47c4-8ecb-81dd9de6267a">
+      <Component Id="Cmp_SQLitePCLRaw_batteries_v2_34" Guid="a6dbedcd-a641-449f-a6d2-0e76d48e4fbb">
         <File Source="$(var.DeployerDir)\SQLitePCLRaw.batteries_v2.dll" />
       </Component>
-      <Component Id="Cmp_SQLitePCLRaw_core_35" Guid="18e2b0d0-8c0d-4e33-9c89-44d32fc5a0c7">
+      <Component Id="Cmp_SQLitePCLRaw_core_35" Guid="b8e089ed-cdc2-4709-84af-271ad99aa79c">
         <File Source="$(var.DeployerDir)\SQLitePCLRaw.core.dll" />
       </Component>
-      <Component Id="Cmp_SQLitePCLRaw_provider_e_sqlite3_36" Guid="96da522b-d222-447b-9e10-275cee3ebed4">
+      <Component Id="Cmp_SQLitePCLRaw_provider_e_sqlite3_36" Guid="b2792308-73ab-45f5-aafb-cd2b84facca4">
         <File Source="$(var.DeployerDir)\SQLitePCLRaw.provider.e_sqlite3.dll" />
       </Component>
-      <Component Id="Cmp_System_CodeDom_37" Guid="cc7489b1-402f-41b0-8ae4-1b5cdbc5f7df">
+      <Component Id="Cmp_System_CodeDom_37" Guid="cfd98ac1-71d8-4946-b025-77879f0d88e3">
         <File Source="$(var.DeployerDir)\System.CodeDom.dll" />
       </Component>
-      <Component Id="Cmp_System_IO_Pipelines_38" Guid="cb217f79-2599-4a83-8cc5-7090305262bf">
+      <Component Id="Cmp_System_IO_Pipelines_38" Guid="0f399f5c-f09a-4386-932d-7074c4de5250">
         <File Source="$(var.DeployerDir)\System.IO.Pipelines.dll" />
       </Component>
-      <Component Id="Cmp_System_Management_39" Guid="383d888e-1021-4c67-b96e-42b1e6d15b7b">
+      <Component Id="Cmp_System_Management_39" Guid="72f9b57e-4325-4048-a977-f15c5146a5c0">
         <File Source="$(var.DeployerDir)\System.Management.dll" />
       </Component>
-      <Component Id="Cmp_System_Security_Cryptography_ProtectedData_40" Guid="728106bf-4d03-4a1f-b5e4-2c3ec43b5fbf">
+      <Component Id="Cmp_System_Security_Cryptography_ProtectedData_40" Guid="262cd72a-b9dc-4309-959f-d7fa63534052">
         <File Source="$(var.DeployerDir)\System.Security.Cryptography.ProtectedData.dll" />
       </Component>
-      <Component Id="Cmp_Tmds_DBus_Protocol_41" Guid="d0bf0a7a-97b5-4710-ab5a-9bfdc6bebc4c">
+      <Component Id="Cmp_Tmds_DBus_Protocol_41" Guid="e341b283-c3d6-4b8b-8965-880e92cae4a5">
         <File Source="$(var.DeployerDir)\Tmds.DBus.Protocol.dll" />
       </Component>
-      <Component Id="Cmp_WSMDeployer_deps_42" Guid="19ab2149-4a40-4269-9821-fed287021e19">
+      <Component Id="Cmp_WSMDeployer_deps_42" Guid="cb7a5557-ebc7-4c9a-9065-ff15d8fe09a4">
         <File Source="$(var.DeployerDir)\WSMDeployer.deps.json" />
       </Component>
-      <Component Id="Cmp_WSMDeployer_43" Guid="5917e2f6-8178-4a06-86fc-d6b70ea616b7">
+      <Component Id="Cmp_WSMDeployer_43" Guid="7f55f483-660e-4772-90af-192f381d9187">
         <File Source="$(var.DeployerDir)\WSMDeployer.dll" />
       </Component>
-      <Component Id="Cmp_WSMDeployer_44" Guid="b37c8918-b26e-4371-96e6-83fc18242e1c">
+      <Component Id="Cmp_WSMDeployer_44" Guid="ea0a8070-c257-421d-b2ba-87e492312a75">
         <File Source="$(var.DeployerDir)\WSMDeployer.exe" KeyPath="yes" />
       </Component>
-      <Component Id="Cmp_WSMDeployer_runtimeconfig_45" Guid="fa538f9c-c4d0-4551-8718-51e221cc3aa5">
+      <Component Id="Cmp_WSMDeployer_runtimeconfig_45" Guid="087cf60c-d404-400b-9d4f-3cd523eff4cc">
         <File Source="$(var.DeployerDir)\WSMDeployer.runtimeconfig.json" />
       </Component>
     </ComponentGroup>
-
-    <!-- Start Menu Shortcut -->
-    <DirectoryRef Id="ApplicationProgramsFolder">
-      <Component Id="StartMenuShortcut" Guid="f6a7b8c9-d0e1-2f3a-4b5c-6d7e8f9a0b1c">
-        <Shortcut Id="StartMenuDeployer"
-                  Name="Vertex Central Deployer"
-                  Description="Deploy and manage Vertex installations"
-                  Target="[INSTALLFOLDER]WSMDeployer.exe"
-                  WorkingDirectory="INSTALLFOLDER" />
-        <RemoveFolder Id="RemoveApplicationProgramsFolder" On="uninstall" />
-        <RegistryValue Root="HKCU"
-                       Key="Software\Vertex\VertexDeployer"
-                       Name="StartMenuShortcut"
-                       Type="integer"
-                       Value="1"
-                       KeyPath="yes" />
-      </Component>
-    </DirectoryRef>
-
-    <!-- Desktop Shortcut -->
-    <DirectoryRef Id="DesktopShortcutFolder">
-      <Component Id="DesktopShortcut" Guid="a7b8c9d0-e1f2-3a4b-5c6d-7e8f9a0b1c2d">
-        <Shortcut Id="DesktopDeployer"
-                  Name="Vertex Central Deployer"
-                  Description="Deploy and manage Vertex installations"
-                  Target="[INSTALLFOLDER]WSMDeployer.exe"
-                  WorkingDirectory="INSTALLFOLDER" />
-        <RegistryValue Root="HKCU"
-                       Key="Software\Vertex\VertexDeployer"
-                       Name="DesktopShortcut"
-                       Type="integer"
-                       Value="1"
-                       KeyPath="yes" />
-      </Component>
-    </DirectoryRef>
-
-    <!-- Create ProgramData Folder -->
-    <DirectoryRef Id="DeployerDataFolder">
-      <Component Id="DataFolderComponent" Guid="b8c9d0e1-f2a3-4b5c-6d7e-8f9a0b1c2d3e">
-        <CreateFolder>
-          <util:PermissionEx User="Administrators" GenericAll="yes" />
-          <util:PermissionEx User="SYSTEM" GenericAll="yes" />
-          <util:PermissionEx User="Users" GenericRead="yes" GenericWrite="yes" GenericExecute="yes" />
-        </CreateFolder>
-        <RemoveFolder Id="RemoveDeployerFolder" On="uninstall" />
-        <RegistryValue Root="HKLM"
-                       Key="Software\Vertex\VertexDeployer"
-                       Name="DataFolder"
-                       Type="integer"
-                       Value="1"
-                       KeyPath="yes" />
-      </Component>
-    </DirectoryRef>
-
-    <!-- Create Database Folder -->
-    <DirectoryRef Id="DatabaseFolder">
-      <Component Id="DatabaseFolderComponent" Guid="c9d0e1f2-a3b4-5c6d-7e8f-9a0b1c2d3e4f">
-        <CreateFolder />
-        <RemoveFolder Id="RemoveDatabaseFolder" On="uninstall" />
-        <RegistryValue Root="HKLM"
-                       Key="Software\Vertex\VertexDeployer"
-                       Name="DatabaseFolder"
-                       Type="integer"
-                       Value="1"
-                       KeyPath="yes" />
-      </Component>
-    </DirectoryRef>
-
-    <!-- Create Logs Folder -->
-    <DirectoryRef Id="LogsFolder">
-      <Component Id="LogsFolderComponent" Guid="d0e1f2a3-b4c5-6d7e-8f9a-0b1c2d3e4f5a">
-        <CreateFolder />
-        <RemoveFolder Id="RemoveLogsFolder" On="uninstall" />
-        <RegistryValue Root="HKLM"
-                       Key="Software\Vertex\VertexDeployer"
-                       Name="LogsFolder"
-                       Type="integer"
-                       Value="1"
-                       KeyPath="yes" />
-      </Component>
-    </DirectoryRef>
-
   </Fragment>
 
 </Wix>
