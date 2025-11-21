@@ -1,0 +1,164 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:WSMDeployer.ViewModels"
+             xmlns:models="using:WSMDeployer.Models"
+             mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="800"
+             x:Class="WSMDeployer.Views.TargetsView"
+             x:DataType="vm:TargetsViewModel">
+
+    <StackPanel Spacing="30">
+        <!-- Page Header -->
+        <Grid ColumnDefinitions="*,Auto">
+            <StackPanel Grid.Column="0" Spacing="10">
+                <TextBlock Text="Target Machines" Classes="heading1"/>
+                <TextBlock Text="Manage machines where Vertex will be deployed" Classes="body"/>
+            </StackPanel>
+
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="10" VerticalAlignment="Center" Margin="20,0,0,0">
+                <Button Classes="secondary" Command="{Binding RefreshCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="🔄" />
+                        <TextBlock Text="Refresh" />
+                    </StackPanel>
+                </Button>
+                <Button Classes="primary" Command="{Binding AddTargetCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="+" FontSize="18" FontWeight="Bold"/>
+                        <TextBlock Text="Add Target" />
+                    </StackPanel>
+                </Button>
+            </StackPanel>
+        </Grid>
+
+        <!-- Search Bar -->
+        <Border Classes="card">
+            <Grid ColumnDefinitions="*,Auto">
+                <TextBox Grid.Column="0"
+                         Classes="modern"
+                         Watermark="Search targets by hostname..."
+                         Text="{Binding SearchQuery}"
+                         Margin="0,0,10,0"/>
+                <Button Grid.Column="1"
+                        Classes="primary"
+                        Command="{Binding SearchCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="🔍" />
+                        <TextBlock Text="Search" />
+                    </StackPanel>
+                </Button>
+            </Grid>
+        </Border>
+
+        <!-- Targets Table -->
+        <Border Classes="card">
+            <StackPanel Spacing="15">
+                <TextBlock Text="{Binding Targets.Count, StringFormat='Total Targets: {0}'}"
+                           Classes="body"
+                           FontWeight="SemiBold"/>
+
+                <DataGrid ItemsSource="{Binding Targets}"
+                          SelectedItem="{Binding SelectedTarget}"
+                          IsReadOnly="True"
+                          GridLinesVisibility="Horizontal"
+                          HeadersVisibility="Column"
+                          AutoGenerateColumns="False"
+                          CanUserReorderColumns="True"
+                          CanUserResizeColumns="True"
+                          MaxHeight="400">
+
+                    <DataGrid.Columns>
+                        <DataGridTextColumn Header="Hostname"
+                                          Binding="{Binding Hostname}"
+                                          Width="200"/>
+
+                        <DataGridTextColumn Header="IP Address"
+                                          Binding="{Binding IPAddress}"
+                                          Width="150"/>
+
+                        <DataGridTextColumn Header="Type"
+                                          Binding="{Binding Type}"
+                                          Width="100"/>
+
+                        <DataGridTextColumn Header="Status"
+                                          Binding="{Binding Status}"
+                                          Width="120"/>
+
+                        <DataGridTextColumn Header="Vertex Version"
+                                          Binding="{Binding VertexVersion}"
+                                          Width="120"/>
+
+                        <DataGridTextColumn Header="Last Seen"
+                                          Binding="{Binding LastSeen, StringFormat='{}{0:MM/dd/yyyy HH:mm}'}"
+                                          Width="*"/>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <!-- Empty State -->
+                <Border IsVisible="{Binding !Targets.Count}" Padding="40">
+                    <StackPanel Spacing="10" HorizontalAlignment="Center">
+                        <TextBlock Text="🖥️" FontSize="48" HorizontalAlignment="Center"/>
+                        <TextBlock Text="No targets configured" Classes="heading3" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Add target machines to start deploying Vertex" Classes="body" HorizontalAlignment="Center"/>
+                        <Button Classes="primary" Command="{Binding AddTargetCommand}" Margin="0,10,0,0" HorizontalAlignment="Center">
+                            <StackPanel Orientation="Horizontal" Spacing="8">
+                                <TextBlock Text="+" FontSize="18" FontWeight="Bold"/>
+                                <TextBlock Text="Add Your First Target" />
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </Border>
+
+        <!-- Selected Target Details -->
+        <Border Classes="card" IsVisible="{Binding SelectedTarget, Converter={x:Static ObjectConverters.IsNotNull}}">
+            <StackPanel Spacing="15">
+                <TextBlock Text="Selected Target Details" Classes="heading3"/>
+                <Separator/>
+
+                <Grid ColumnDefinitions="150,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto">
+                    <TextBlock Grid.Row="0" Grid.Column="0" Text="Hostname:" Classes="body" FontWeight="SemiBold" Margin="0,5"/>
+                    <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding SelectedTarget.Hostname}" Classes="body" Margin="0,5"/>
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Text="IP Address:" Classes="body" FontWeight="SemiBold" Margin="0,5"/>
+                    <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding SelectedTarget.IPAddress}" Classes="body" Margin="0,5"/>
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Text="Type:" Classes="body" FontWeight="SemiBold" Margin="0,5"/>
+                    <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding SelectedTarget.Type}" Classes="body" Margin="0,5"/>
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Text="Status:" Classes="body" FontWeight="SemiBold" Margin="0,5"/>
+                    <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding SelectedTarget.Status}" Classes="body" Margin="0,5"/>
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Text="Vertex Version:" Classes="body" FontWeight="SemiBold" Margin="0,5"/>
+                    <TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding SelectedTarget.VertexVersion}" Classes="body" Margin="0,5"/>
+
+                    <TextBlock Grid.Row="5" Grid.Column="0" Text="Last Seen:" Classes="body" FontWeight="SemiBold" Margin="0,5"/>
+                    <TextBlock Grid.Row="5" Grid.Column="1" Text="{Binding SelectedTarget.LastSeen, StringFormat='{}{0:MM/dd/yyyy HH:mm}'}" Classes="body" Margin="0,5"/>
+                </Grid>
+
+                <StackPanel Orientation="Horizontal" Spacing="10" Margin="0,10,0,0">
+                    <Button Classes="success" Command="{Binding DeployCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="🚀" />
+                            <TextBlock Text="Deploy Vertex" />
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="primary" Command="{Binding EditTargetCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="✏️" />
+                            <TextBlock Text="Edit" />
+                        </StackPanel>
+                    </Button>
+                    <Button Classes="warning" Command="{Binding DeleteTargetCommand}">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <TextBlock Text="🗑️" />
+                            <TextBlock Text="Delete" />
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </StackPanel>
+</UserControl>

@@ -1,0 +1,85 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:WSMDeployer.ViewModels"
+        xmlns:models="using:WSMDeployer.Models"
+        mc:Ignorable="d" d:DesignWidth="500" d:DesignHeight="450"
+        x:Class="WSMDeployer.Views.TargetDialog"
+        x:DataType="vm:TargetDialogViewModel"
+        Width="500" Height="450"
+        Title="{Binding DialogTitle}"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False">
+
+    <Grid Margin="20">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <TextBlock Grid.Row="0" Text="{Binding DialogTitle}" Classes="heading2" Margin="0,0,0,20"/>
+
+        <!-- Form -->
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Spacing="15">
+                <!-- Hostname -->
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Hostname *" Classes="body" FontWeight="SemiBold"/>
+                    <TextBox Text="{Binding Hostname}"
+                             Watermark="e.g., MACHINE01 or workstation.domain.com"
+                             Classes="modern"/>
+                    <TextBlock Text="Machine name or FQDN" Classes="body" FontSize="11" Opacity="0.7"/>
+                </StackPanel>
+
+                <!-- IP Address -->
+                <StackPanel Spacing="5">
+                    <TextBlock Text="IP Address (Optional)" Classes="body" FontWeight="SemiBold"/>
+                    <TextBox Text="{Binding IPAddress}"
+                             Watermark="e.g., 192.168.1.100"
+                             Classes="modern"/>
+                </StackPanel>
+
+                <!-- Type -->
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Machine Type" Classes="body" FontWeight="SemiBold"/>
+                    <ComboBox SelectedIndex="{Binding SelectedType}"
+                              HorizontalAlignment="Stretch">
+                        <ComboBoxItem Content="Domain Member"/>
+                        <ComboBoxItem Content="Workgroup"/>
+                        <ComboBoxItem Content="Standalone"/>
+                    </ComboBox>
+                </StackPanel>
+
+                <!-- Credential Profile -->
+                <StackPanel Spacing="5">
+                    <TextBlock Text="Credential Profile (Optional)" Classes="body" FontWeight="SemiBold"/>
+                    <ComboBox ItemsSource="{Binding CredentialProfiles}"
+                              HorizontalAlignment="Stretch">
+                        <ComboBox.ItemTemplate>
+                            <DataTemplate>
+                                <TextBlock Text="{Binding Name}"/>
+                            </DataTemplate>
+                        </ComboBox.ItemTemplate>
+                    </ComboBox>
+                    <TextBlock Text="Leave empty to enter credentials during deployment"
+                               Classes="body" FontSize="11" Opacity="0.7"/>
+                </StackPanel>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Buttons -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button Content="Cancel"
+                    Classes="secondary"
+                    Command="{Binding CancelCommand}"
+                    Width="100"/>
+            <Button Content="Save"
+                    Classes="primary"
+                    Command="{Binding SaveCommand}"
+                    Width="100"/>
+        </StackPanel>
+    </Grid>
+</Window>

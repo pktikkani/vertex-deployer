@@ -1,0 +1,35 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Light Theme - Claude.ai Style -->
+
+    <!-- Background Colors -->
+    <SolidColorBrush x:Key="AppBackground" Color="#F5F5F0"/>
+    <SolidColorBrush x:Key="AppBackground2" Color="#EEEEE8"/>
+    <SolidColorBrush x:Key="SurfaceBackground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="CardBackground" Color="#FFFFFF"/>
+    <SolidColorBrush x:Key="BorderBrush" Color="#D9D9D4"/>
+    <SolidColorBrush x:Key="HoverBackground" Color="#E8E8E0"/>
+
+    <!-- Text Colors -->
+    <SolidColorBrush x:Key="TextPrimary" Color="#1F1F1F"/>
+    <SolidColorBrush x:Key="TextSecondary" Color="#5C5C5C"/>
+    <SolidColorBrush x:Key="TextMuted" Color="#8F8F8F"/>
+
+    <!-- Claude Orange Buttons -->
+    <SolidColorBrush x:Key="PrimaryBrush" Color="#CC5500"/>
+    <SolidColorBrush x:Key="SuccessBrush" Color="#059669"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="#D97706"/>
+    <SolidColorBrush x:Key="ErrorBrush" Color="#DC2626"/>
+
+    <!-- Gradients -->
+    <LinearGradientBrush x:Key="SidebarGradient" StartPoint="0%,0%" EndPoint="0%,100%">
+        <GradientStop Color="#F5F5F0" Offset="0" />
+        <GradientStop Color="#EEEEE8" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="PrimaryGradient" StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Color="#CC5500" Offset="0"/>
+        <GradientStop Color="#E06010" Offset="1"/>
+    </LinearGradientBrush>
+</ResourceDictionary>

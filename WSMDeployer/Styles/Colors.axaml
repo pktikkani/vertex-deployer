@@ -1,0 +1,126 @@
+<ResourceDictionary xmlns="https://github.com/avaloniaui"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Modern Color Palette - Tailwind-inspired -->
+
+    <!-- Primary Colors - Blue -->
+    <Color x:Key="Primary50">#eff6ff</Color>
+    <Color x:Key="Primary100">#dbeafe</Color>
+    <Color x:Key="Primary200">#bfdbfe</Color>
+    <Color x:Key="Primary300">#93c5fd</Color>
+    <Color x:Key="Primary400">#60a5fa</Color>
+    <Color x:Key="Primary500">#3b82f6</Color>
+    <Color x:Key="Primary600">#2563eb</Color>
+    <Color x:Key="Primary700">#1d4ed8</Color>
+    <Color x:Key="Primary800">#1e40af</Color>
+    <Color x:Key="Primary900">#1e3a8a</Color>
+
+    <!-- Success Colors - Green -->
+    <Color x:Key="Success50">#f0fdf4</Color>
+    <Color x:Key="Success100">#dcfce7</Color>
+    <Color x:Key="Success200">#bbf7d0</Color>
+    <Color x:Key="Success300">#86efac</Color>
+    <Color x:Key="Success400">#4ade80</Color>
+    <Color x:Key="Success500">#22c55e</Color>
+    <Color x:Key="Success600">#16a34a</Color>
+    <Color x:Key="Success700">#15803d</Color>
+
+    <!-- Warning Colors - Yellow/Orange -->
+    <Color x:Key="Warning50">#fffbeb</Color>
+    <Color x:Key="Warning100">#fef3c7</Color>
+    <Color x:Key="Warning200">#fde68a</Color>
+    <Color x:Key="Warning300">#fcd34d</Color>
+    <Color x:Key="Warning400">#fbbf24</Color>
+    <Color x:Key="Warning500">#f59e0b</Color>
+    <Color x:Key="Warning600">#d97706</Color>
+
+    <!-- Error Colors - Red -->
+    <Color x:Key="Error50">#fef2f2</Color>
+    <Color x:Key="Error100">#fee2e2</Color>
+    <Color x:Key="Error200">#fecaca</Color>
+    <Color x:Key="Error300">#fca5a5</Color>
+    <Color x:Key="Error400">#f87171</Color>
+    <Color x:Key="Error500">#ef4444</Color>
+    <Color x:Key="Error600">#dc2626</Color>
+
+    <!-- Info Colors - Cyan -->
+    <Color x:Key="Info50">#ecfeff</Color>
+    <Color x:Key="Info100">#cffafe</Color>
+    <Color x:Key="Info200">#a5f3fc</Color>
+    <Color x:Key="Info300">#67e8f9</Color>
+    <Color x:Key="Info400">#22d3ee</Color>
+    <Color x:Key="Info500">#06b6d4</Color>
+    <Color x:Key="Info600">#0891b2</Color>
+
+    <!-- Neutral Colors - Gray -->
+    <Color x:Key="Gray50">#f9fafb</Color>
+    <Color x:Key="Gray100">#f3f4f6</Color>
+    <Color x:Key="Gray200">#e5e7eb</Color>
+    <Color x:Key="Gray300">#d1d5db</Color>
+    <Color x:Key="Gray400">#9ca3af</Color>
+    <Color x:Key="Gray500">#6b7280</Color>
+    <Color x:Key="Gray600">#4b5563</Color>
+    <Color x:Key="Gray700">#374151</Color>
+    <Color x:Key="Gray800">#1f2937</Color>
+    <Color x:Key="Gray900">#111827</Color>
+
+    <!-- Solid Color Brushes -->
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource Primary600}" />
+    <SolidColorBrush x:Key="PrimaryHoverBrush" Color="{StaticResource Primary700}" />
+    <SolidColorBrush x:Key="PrimaryLightBrush" Color="{StaticResource Primary100}" />
+
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource Success600}" />
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource Warning500}" />
+    <SolidColorBrush x:Key="ErrorBrush" Color="{StaticResource Error500}" />
+    <SolidColorBrush x:Key="InfoBrush" Color="{StaticResource Info500}" />
+
+    <!-- Background Colors -->
+    <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource Gray50}" />
+    <SolidColorBrush x:Key="CardBackgroundBrush" Color="#FFFFFF" />
+    <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="{StaticResource Gray900}" />
+
+    <!-- Text Colors -->
+    <SolidColorBrush x:Key="TextPrimaryBrush" Color="{StaticResource Gray900}" />
+    <SolidColorBrush x:Key="TextSecondaryBrush" Color="{StaticResource Gray600}" />
+    <SolidColorBrush x:Key="TextMutedBrush" Color="{StaticResource Gray400}" />
+    <SolidColorBrush x:Key="TextOnDarkBrush" Color="#FFFFFF" />
+
+    <!-- Border Colors -->
+    <SolidColorBrush x:Key="BorderBrush" Color="{StaticResource Gray200}" />
+    <SolidColorBrush x:Key="BorderFocusBrush" Color="{StaticResource Primary500}" />
+
+    <!-- Gradient Brushes - Glossy Effects -->
+    <LinearGradientBrush x:Key="PrimaryGradientBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Color="{StaticResource Primary500}" Offset="0" />
+        <GradientStop Color="{StaticResource Primary700}" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="SuccessGradientBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Color="{StaticResource Success500}" Offset="0" />
+        <GradientStop Color="{StaticResource Success700}" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="WarningGradientBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Color="{StaticResource Warning400}" Offset="0" />
+        <GradientStop Color="{StaticResource Warning600}" Offset="1" />
+    </LinearGradientBrush>
+
+    <LinearGradientBrush x:Key="CardGlossyBrush" StartPoint="0%,0%" EndPoint="0%,100%">
+        <GradientStop Color="#FFFFFF" Offset="0" />
+        <GradientStop Color="#F8FAFC" Offset="1" />
+    </LinearGradientBrush>
+
+    <!-- Sidebar Gradient -->
+    <LinearGradientBrush x:Key="SidebarGradientBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Color="{StaticResource Gray900}" Offset="0" />
+        <GradientStop Color="{StaticResource Gray800}" Offset="1" />
+    </LinearGradientBrush>
+
+    <!-- Hero/Header Gradient -->
+    <LinearGradientBrush x:Key="HeroGradientBrush" StartPoint="0%,0%" EndPoint="100%,100%">
+        <GradientStop Color="{StaticResource Primary600}" Offset="0" />
+        <GradientStop Color="{StaticResource Primary800}" Offset="0.5" />
+        <GradientStop Color="{StaticResource Info600}" Offset="1" />
+    </LinearGradientBrush>
+
+</ResourceDictionary>

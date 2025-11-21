@@ -1,0 +1,142 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:WSMDeployer.ViewModels"
+        xmlns:views="using:WSMDeployer.Views"
+        mc:Ignorable="d" d:DesignWidth="1400" d:DesignHeight="900"
+        x:Class="WSMDeployer.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Width="1400" Height="900"
+        MinWidth="1200" MinHeight="700"
+        Title="Vertex Central Deployer"
+        Background="{DynamicResource AppBackground}"
+        WindowStartupLocation="CenterScreen"
+        TransparencyLevelHint="None">
+
+    <Window.DataContext>
+        <vm:MainWindowViewModel />
+    </Window.DataContext>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <!-- Sidebar -->
+            <ColumnDefinition Width="250" />
+            <!-- Main content -->
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!-- Sidebar with modern gradient background -->
+        <Border Grid.Column="0" Background="{DynamicResource SidebarGradient}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- Logo/Header -->
+                <Border Grid.Row="0" Padding="20" Margin="0,20,0,30">
+                    <StackPanel>
+                        <TextBlock Text="Vertex" FontSize="28" FontWeight="Bold"
+                                   Foreground="{DynamicResource TextPrimary}" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Central Deployer" FontSize="12"
+                                   Foreground="{DynamicResource TextSecondary}" HorizontalAlignment="Center" Margin="0,5,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Navigation Buttons -->
+                <StackPanel Grid.Row="1" Margin="12,0">
+                    <Button Classes="nav-item"
+                            Classes.selected="{Binding SelectedPage, Converter={x:Static ObjectConverters.Equal}, ConverterParameter=Dashboard}"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="Dashboard">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock Text="📊" FontSize="18" />
+                            <TextBlock Text="Dashboard" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Classes="nav-item"
+                            Classes.selected="{Binding SelectedPage, Converter={x:Static ObjectConverters.Equal}, ConverterParameter=Targets}"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="Targets">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock Text="🖥️" FontSize="18" />
+                            <TextBlock Text="Targets" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+
+                    <Button Classes="nav-item"
+                            Classes.selected="{Binding SelectedPage, Converter={x:Static ObjectConverters.Equal}, ConverterParameter=Deployments}"
+                            Command="{Binding NavigateCommand}"
+                            CommandParameter="Deployments">
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                            <TextBlock Text="🚀" FontSize="18" />
+                            <TextBlock Text="Deployments" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <!-- Theme Selector & Version Info at bottom -->
+                <StackPanel Grid.Row="2" Margin="12,0,12,20" Spacing="12">
+                    <Separator Background="{DynamicResource BorderBrush}" Margin="8,0"/>
+
+                    <!-- Theme Selector -->
+                    <StackPanel Spacing="8">
+                        <TextBlock Text="🎨 Theme"
+                                   FontSize="12"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource TextSecondary}"
+                                   Margin="8,0,0,0"/>
+                        <ComboBox ItemsSource="{Binding AvailableThemes}"
+                                  SelectedItem="{Binding SelectedThemeItem}"
+                                  HorizontalAlignment="Stretch"
+                                  Margin="8,0">
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding DisplayName}"/>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
+                    </StackPanel>
+
+                    <TextBlock Text="Version 1.0.0"
+                               FontSize="11"
+                               Foreground="{DynamicResource TextMuted}"
+                               HorizontalAlignment="Center"
+                               Margin="0,8,0,0"/>
+                    <TextBlock Text="© 2025 Vertex Security"
+                               FontSize="10"
+                               Foreground="{DynamicResource TextMuted}"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <!-- Main Content Area -->
+        <Border Grid.Column="1" Padding="30" Background="{DynamicResource AppBackground2}">
+            <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <!-- Content presenter for different pages -->
+                <ContentControl Content="{Binding CurrentPage}">
+                    <ContentControl.DataTemplates>
+                        <!-- Dashboard Template -->
+                        <DataTemplate DataType="vm:DashboardViewModel">
+                            <views:DashboardView />
+                        </DataTemplate>
+
+                        <!-- Targets Template -->
+                        <DataTemplate DataType="vm:TargetsViewModel">
+                            <views:TargetsView />
+                        </DataTemplate>
+
+                        <!-- Deployments Template -->
+                        <DataTemplate DataType="vm:DeploymentsViewModel">
+                            <views:DeploymentsView />
+                        </DataTemplate>
+                    </ContentControl.DataTemplates>
+                </ContentControl>
+            </ScrollViewer>
+        </Border>
+    </Grid>
+</Window>

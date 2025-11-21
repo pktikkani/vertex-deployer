@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs"
+     xmlns:ui="http://wixtoolset.org/schemas/v4/wxs/ui">
+
+  <Package Name="Vertex Central Deployer"
+           Version="1.0.0.0"
+           Manufacturer="Vertex Security"
+           UpgradeCode="a1b2c3d4-e5f6-4a5b-8c9d-0e1f2a3b4c5d"
+           Compressed="yes"
+           InstallerVersion="500"
+           Scope="perMachine">
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of [ProductName] is already installed." />
+
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Require Administrator -->
+    <Property Id="ALLUSERS" Value="1" />
+
+    <!-- UI Configuration -->
+    <ui:WixUI Id="WixUI_InstallDir" />
+    <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
+
+    <!-- License -->
+    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+
+    <!-- Features -->
+    <Feature Id="MainFeature" Title="Vertex Central Deployer" Level="1">
+      <ComponentGroupRef Id="AllFiles" />
+      <ComponentRef Id="StartMenuShortcut" />
+      <ComponentRef Id="DesktopShortcut" />
+      <ComponentRef Id="DataFolderComponent" />
+      <ComponentRef Id="DatabaseFolderComponent" />
+      <ComponentRef Id="LogsFolderComponent" />
+    </Feature>
+
+    <!-- Standard Directories -->
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="VertexDeployer" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="ApplicationProgramsFolder" Name="Vertex Central Deployer" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="DesktopFolder">
+      <Directory Id="DesktopShortcutFolder" />
+    </StandardDirectory>
+
+    <StandardDirectory Id="CommonAppDataFolder">
+      <Directory Id="DeployerDataFolder" Name="VertexDeployer">
+        <Directory Id="DatabaseFolder" Name="Database" />
+        <Directory Id="LogsFolder" Name="Logs" />
+      </Directory>
+    </StandardDirectory>
+
+  </Package>
+
+  <!-- Components -->
+  <Fragment>
+    <!-- Start Menu Shortcut -->
+    <Component Id="StartMenuShortcut" Directory="ApplicationProgramsFolder">
+      <Shortcut Id="StartMenuShortcut"
+                Name="Vertex Central Deployer"
+                Description="Deploy and manage Vertex installations"
+                Target="[INSTALLFOLDER]WSMDeployer.exe"
+                WorkingDirectory="INSTALLFOLDER" />
+      <RemoveFolder Id="RemoveProgramMenuFolder" Directory="ApplicationProgramsFolder" On="uninstall" />
+      <RegistryValue Root="HKCU" Key="Software\Vertex\VertexDeployer" Name="StartMenuShortcut" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <!-- Desktop Shortcut -->
+    <Component Id="DesktopShortcut" Directory="DesktopShortcutFolder">
+      <Shortcut Id="DesktopShortcut"
+                Name="Vertex Central Deployer"
+                Description="Deploy and manage Vertex installations"
+                Target="[INSTALLFOLDER]WSMDeployer.exe"
+                WorkingDirectory="INSTALLFOLDER" />
+      <RegistryValue Root="HKCU" Key="Software\Vertex\VertexDeployer" Name="DesktopShortcut" Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <!-- Data Folder with cleanup -->
+    <Component Id="DataFolderComponent" Directory="DeployerDataFolder">
+      <CreateFolder />
+      <RemoveFile Id="RemoveDeployerDb" Name="deployer.db" On="uninstall" />
+      <RemoveFile Id="RemoveAllDbFiles" Name="*.db" On="uninstall" />
+      <RemoveFile Id="RemoveAllDbShm" Name="*.db-shm" On="uninstall" />
+      <RemoveFile Id="RemoveAllDbWal" Name="*.db-wal" On="uninstall" />
+      <RemoveFolder Id="RemoveDeployerDataFolder" On="uninstall" />
+      <RegistryValue Root="HKLM" Key="Software\Vertex\VertexDeployer" Name="DataFolder" Type="string" Value="[DeployerDataFolder]" KeyPath="yes" />
+    </Component>
+
+    <!-- Database Folder cleanup -->
+    <Component Id="DatabaseFolderComponent" Directory="DatabaseFolder">
+      <CreateFolder />
+      <RemoveFile Id="RemoveDatabaseFiles" Name="*.*" On="uninstall" />
+      <RemoveFolder Id="RemoveDatabaseFolder" On="uninstall" />
+      <RegistryValue Root="HKLM" Key="Software\Vertex\VertexDeployer" Name="DatabaseFolder" Type="string" Value="[DatabaseFolder]" KeyPath="yes" />
+    </Component>
+
+    <!-- Logs Folder cleanup -->
+    <Component Id="LogsFolderComponent" Directory="LogsFolder">
+      <CreateFolder />
+      <RemoveFile Id="RemoveLogFiles" Name="*.*" On="uninstall" />
+      <RemoveFolder Id="RemoveLogsFolder" On="uninstall" />
+      <RegistryValue Root="HKLM" Key="Software\Vertex\VertexDeployer" Name="LogsFolder" Type="string" Value="[LogsFolder]" KeyPath="yes" />
+    </Component>
+  </Fragment>
+
+</Wix>

@@ -1,0 +1,165 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:WSMDeployer.ViewModels"
+        x:Class="WSMDeployer.Views.DeploymentDialog"
+        x:DataType="vm:DeploymentDialogViewModel"
+        Width="600" Height="500"
+        Title="Deploy Vertex"
+        WindowStartupLocation="CenterOwner"
+        CanResize="False"
+        Background="{DynamicResource AppBackground}">
+
+    <Grid Margin="30">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <StackPanel Grid.Row="0" Spacing="10" Margin="0,0,0,20">
+            <TextBlock Text="Deploy Vertex to Target" Classes="heading2"/>
+            <Separator Background="{DynamicResource BorderBrush}"/>
+            <Grid ColumnDefinitions="120,*" RowDefinitions="Auto,Auto" Margin="0,10,0,0">
+                <TextBlock Grid.Row="0" Grid.Column="0" Text="Target:" Classes="body" FontWeight="SemiBold"/>
+                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding TargetHostname}" Classes="body"/>
+
+                <TextBlock Grid.Row="1" Grid.Column="0" Text="IP Address:" Classes="body" FontWeight="SemiBold" Margin="0,5,0,0"/>
+                <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding TargetIp}" Classes="body" Margin="0,5,0,0"/>
+            </Grid>
+        </StackPanel>
+
+        <!-- Content -->
+        <ScrollViewer Grid.Row="1">
+            <StackPanel Spacing="20">
+                <!-- MSI File Selection -->
+                <Border Classes="card">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="📦 Vertex MSI File" Classes="heading3" FontSize="16"/>
+                        <Separator Background="{DynamicResource BorderBrush}"/>
+
+                        <StackPanel Spacing="8">
+                            <TextBlock Text="Select the Vertex MSI installer file:" Classes="body"/>
+                            <Grid ColumnDefinitions="*,Auto">
+                                <TextBox Grid.Column="0"
+                                         Text="{Binding MsiFilePath}"
+                                         Classes="modern"
+                                         Watermark="Path to Vertex MSI file..."
+                                         IsReadOnly="True"
+                                         Margin="0,0,10,0"/>
+                                <Button Grid.Column="1"
+                                        Classes="secondary"
+                                        Command="{Binding BrowseMsiCommand}"
+                                        Width="100">
+                                    <StackPanel Orientation="Horizontal" Spacing="8">
+                                        <TextBlock Text="📁" />
+                                        <TextBlock Text="Browse" />
+                                    </StackPanel>
+                                </Button>
+                            </Grid>
+
+                            <!-- File info -->
+                            <TextBlock Text="{Binding MsiFilePath, StringFormat='Selected: {0}'}"
+                                       Classes="body"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource TextMuted}"
+                                       IsVisible="{Binding MsiFilePath, Converter={x:Static StringConverters.IsNotNullOrEmpty}}"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Installation Scope -->
+                <Border Classes="card">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="⚙️ Installation Scope" Classes="heading3" FontSize="16"/>
+                        <Separator Background="{DynamicResource BorderBrush}"/>
+
+                        <StackPanel Spacing="15">
+                            <!-- System-wide option -->
+                            <Border Classes="card" Background="{DynamicResource SurfaceBackground}" Padding="15">
+                                <StackPanel Spacing="8">
+                                    <RadioButton IsChecked="{Binding IsSystemWide}"
+                                                 GroupName="InstallScope">
+                                        <TextBlock Text="System-wide Installation (Recommended)" FontWeight="SemiBold"/>
+                                    </RadioButton>
+                                    <TextBlock Text="• Requires administrator privileges"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource TextSecondary}"
+                                               Margin="28,0,0,0"/>
+                                    <TextBlock Text="• Installs to C:\Program Files"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource TextSecondary}"
+                                               Margin="28,0,0,0"/>
+                                    <TextBlock Text="• Available to all users on the machine"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource TextSecondary}"
+                                               Margin="28,0,0,0"/>
+                                </StackPanel>
+                            </Border>
+
+                            <!-- Per-user option -->
+                            <Border Classes="card" Background="{DynamicResource SurfaceBackground}" Padding="15">
+                                <StackPanel Spacing="8">
+                                    <RadioButton IsChecked="{Binding IsPerUser}"
+                                                 GroupName="InstallScope">
+                                        <TextBlock Text="Per-User Installation" FontWeight="SemiBold"/>
+                                    </RadioButton>
+                                    <TextBlock Text="• No administrator privileges required"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource TextSecondary}"
+                                               Margin="28,0,0,0"/>
+                                    <TextBlock Text="• Installs to user's AppData folder"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource TextSecondary}"
+                                               Margin="28,0,0,0"/>
+                                    <TextBlock Text="• Only available to the logged-in user"
+                                               FontSize="12"
+                                               Foreground="{DynamicResource TextSecondary}"
+                                               Margin="28,0,0,0"/>
+                                </StackPanel>
+                            </Border>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- Status Message -->
+                <Border Classes="card"
+                        Background="{DynamicResource PrimaryBrush}"
+                        IsVisible="{Binding IsDeploying}"
+                        Padding="15">
+                    <StackPanel Orientation="Horizontal" Spacing="12">
+                        <TextBlock Text="⏳" FontSize="20"/>
+                        <StackPanel>
+                            <TextBlock Text="{Binding StatusMessage}"
+                                       Foreground="White"
+                                       FontWeight="SemiBold"/>
+                            <TextBlock Text="Please wait..."
+                                       Foreground="White"
+                                       FontSize="12"
+                                       Opacity="0.8"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Action Buttons -->
+        <StackPanel Grid.Row="2" Orientation="Horizontal" Spacing="10" HorizontalAlignment="Right" Margin="0,20,0,0">
+            <Button Content="Cancel"
+                    Classes="secondary"
+                    Command="{Binding CancelCommand}"
+                    IsEnabled="{Binding !IsDeploying}"
+                    Width="120"/>
+            <Button Classes="success"
+                    Command="{Binding DeployCommand}"
+                    IsEnabled="{Binding !IsDeploying}"
+                    Width="120">
+                <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBlock Text="🚀" />
+                    <TextBlock Text="Deploy Now" />
+                </StackPanel>
+            </Button>
+        </StackPanel>
+    </Grid>
+</Window>

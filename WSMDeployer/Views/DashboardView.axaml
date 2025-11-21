@@ -1,0 +1,108 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:vm="using:WSMDeployer.ViewModels"
+             xmlns:models="using:WSMDeployer.Models"
+             mc:Ignorable="d" d:DesignWidth="1100" d:DesignHeight="800"
+             x:Class="WSMDeployer.Views.DashboardView"
+             x:DataType="vm:DashboardViewModel">
+
+    <StackPanel Spacing="30">
+        <!-- Page Header -->
+        <StackPanel Spacing="10">
+            <TextBlock Text="Dashboard" Classes="heading1"/>
+            <TextBlock Text="Overview of your Vertex deployment infrastructure" Classes="body"/>
+        </StackPanel>
+
+        <!-- Metrics Cards -->
+        <Grid ColumnDefinitions="*,*,*,*" RowDefinitions="Auto">
+            <Border Grid.Column="0" Classes="metric-card" Margin="0,0,10,0">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="📋 Total Targets" Classes="caption" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    <TextBlock Text="{Binding TotalTargets}" FontSize="36" FontWeight="Bold" Foreground="{DynamicResource PrimaryBrush}"/>
+                    <TextBlock Text="Machines in inventory" Classes="caption"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="1" Classes="metric-card" Margin="10,0,10,0">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="🚀 Active Deployments" Classes="caption" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    <TextBlock Text="{Binding ActiveDeployments}" FontSize="36" FontWeight="Bold" Foreground="{DynamicResource WarningBrush}"/>
+                    <TextBlock Text="Currently deploying" Classes="caption"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="2" Classes="metric-card" Margin="10,0,10,0">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="✅ Success Rate" Classes="caption" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    <StackPanel Orientation="Horizontal" Spacing="5">
+                        <TextBlock Text="{Binding SuccessRate}" FontSize="36" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}"/>
+                        <TextBlock Text="%" FontSize="24" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}" VerticalAlignment="Bottom" Margin="0,0,0,5"/>
+                    </StackPanel>
+                    <TextBlock Text="Last 30 days" Classes="caption"/>
+                </StackPanel>
+            </Border>
+
+            <Border Grid.Column="3" Classes="metric-card" Margin="10,0,0,0">
+                <StackPanel Spacing="10">
+                    <TextBlock Text="💚 Healthy Targets" Classes="caption" Foreground="{DynamicResource TextSecondaryBrush}"/>
+                    <TextBlock Text="{Binding HealthyTargets}" FontSize="36" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}"/>
+                    <TextBlock Text="Online and responding" Classes="caption"/>
+                </StackPanel>
+            </Border>
+        </Grid>
+
+        <!-- Recent Activity Section -->
+        <StackPanel Spacing="20">
+            <StackPanel Spacing="5">
+                <TextBlock Text="Recent Deployments" Classes="heading2"/>
+                <TextBlock Text="Latest deployment activity" Classes="body"/>
+            </StackPanel>
+
+            <Border Classes="card">
+                <StackPanel Spacing="15">
+                    <!-- Deployment List -->
+                    <ItemsControl ItemsSource="{Binding RecentDeployments}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="15" Margin="0,5" Background="{DynamicResource Gray50}" CornerRadius="8">
+                                    <Grid ColumnDefinitions="200,150,*,150">
+                                        <StackPanel Grid.Column="0" Spacing="5">
+                                            <TextBlock Text="Target" Classes="caption"/>
+                                            <TextBlock Text="{Binding Target.Hostname}" Classes="body" FontWeight="Medium"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="1" Spacing="5" Margin="15,0">
+                                            <TextBlock Text="Method" Classes="caption"/>
+                                            <TextBlock Text="{Binding Method}" Classes="body"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="2" Spacing="5" Margin="15,0">
+                                            <TextBlock Text="Status" Classes="caption"/>
+                                            <TextBlock Text="{Binding StatusDisplay}" Classes="body" FontWeight="SemiBold"/>
+                                        </StackPanel>
+
+                                        <StackPanel Grid.Column="3" Spacing="5" Margin="15,0">
+                                            <TextBlock Text="Date" Classes="caption"/>
+                                            <TextBlock Text="{Binding CreatedDate, StringFormat='{}{0:MM/dd HH:mm}'}" Classes="body"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <!-- Empty State -->
+                    <Border IsVisible="{Binding !RecentDeployments.Count}" Padding="40">
+                        <StackPanel Spacing="10" HorizontalAlignment="Center">
+                            <TextBlock Text="📭" FontSize="48" HorizontalAlignment="Center"/>
+                            <TextBlock Text="No deployments yet" Classes="heading3" HorizontalAlignment="Center"/>
+                            <TextBlock Text="Start deploying Vertex to see activity here" Classes="body" HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </StackPanel>
+</UserControl>
