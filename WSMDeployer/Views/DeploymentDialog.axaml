@@ -32,6 +32,41 @@
         <!-- Content -->
         <ScrollViewer Grid.Row="1">
             <StackPanel Spacing="20">
+                <!-- Admin Credentials -->
+                <Border Classes="card">
+                    <StackPanel Spacing="12">
+                        <TextBlock Text="🔐 Administrator Credentials" Classes="heading3" FontSize="16"/>
+                        <Separator Background="{DynamicResource BorderBrush}"/>
+
+                        <StackPanel Spacing="12">
+                            <TextBlock Text="Provide administrator credentials for the target machine:" Classes="body" FontSize="12"/>
+
+                            <!-- Username -->
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Username:" Classes="body" FontWeight="SemiBold"/>
+                                <TextBox Text="{Binding AdminUsername}"
+                                         Classes="modern"
+                                         Watermark="e.g., Administrator or DOMAIN\username"/>
+                            </StackPanel>
+
+                            <!-- Password -->
+                            <StackPanel Spacing="6">
+                                <TextBlock Text="Password:" Classes="body" FontWeight="SemiBold"/>
+                                <TextBox Text="{Binding AdminPassword}"
+                                         Classes="modern"
+                                         Watermark="Enter password"
+                                         PasswordChar="●"
+                                         RevealPassword="False"/>
+                            </StackPanel>
+
+                            <TextBlock Text="⚠️ These credentials are used to connect to the target machine and will not be stored."
+                                       FontSize="11"
+                                       Foreground="{DynamicResource WarningBrush}"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
                 <!-- MSI File Selection -->
                 <Border Classes="card">
                     <StackPanel Spacing="12">

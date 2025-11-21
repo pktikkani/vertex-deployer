@@ -21,6 +21,8 @@ namespace WSMDeployer.ViewModels
         private string _statusMessage = string.Empty;
         private bool _isLoadingUsers = false;
         private ObservableCollection<UserAccount> _availableUsers = new ObservableCollection<UserAccount>();
+        private string _adminUsername = string.Empty;
+        private string _adminPassword = string.Empty;
 
         public DeploymentDialogViewModel(DatabaseService db, Target target)
         {
@@ -123,6 +125,32 @@ namespace WSMDeployer.ViewModels
 
         public string LoadUsersButtonText => IsLoadingUsers ? "Loading Users..." : "Load Non-Admin Users from Target";
 
+        public string AdminUsername
+        {
+            get => _adminUsername;
+            set
+            {
+                if (SetProperty(ref _adminUsername, value))
+                {
+                    ((RelayCommand)DeployCommand).RaiseCanExecuteChanged();
+                    ((RelayCommand)LoadUsersCommand).RaiseCanExecuteChanged();
+                }
+            }
+        }
+
+        public string AdminPassword
+        {
+            get => _adminPassword;
+            set
+            {
+                if (SetProperty(ref _adminPassword, value))
+                {
+                    ((RelayCommand)DeployCommand).RaiseCanExecuteChanged();
+                    ((RelayCommand)LoadUsersCommand).RaiseCanExecuteChanged();
+                }
+            }
+        }
+
         // Commands
         public ICommand BrowseMsiCommand { get; }
         public ICommand DeployCommand { get; }
@@ -165,6 +193,12 @@ namespace WSMDeployer.ViewModels
 
         private bool CanDeploy()
         {
+            // Require credentials
+            if (string.IsNullOrWhiteSpace(AdminUsername) || string.IsNullOrWhiteSpace(AdminPassword))
+            {
+                return false;
+            }
+
             if (string.IsNullOrWhiteSpace(MsiFilePath) || !File.Exists(MsiFilePath) || IsDeploying)
             {
                 return false;
@@ -204,12 +238,14 @@ namespace WSMDeployer.ViewModels
 
                     StatusMessage = $"Deploying to {selectedUsers.Count} user(s)...";
 
-                    // Start per-user deployment in background
+                    // Start per-user deployment in background with provided credentials
                     deployment = await System.Threading.Tasks.Task.Run(async () =>
                     {
                         return await deploymentService.DeployToTargetPerUser(
                             _target,
                             MsiFilePath,
+                            AdminUsername,
+                            AdminPassword,
                             selectedUsers
                         );
                     });
@@ -224,6 +260,8 @@ namespace WSMDeployer.ViewModels
                         return await deploymentService.DeployToTargetAsync(
                             _target,
                             MsiFilePath,
+                            AdminUsername,
+                            AdminPassword,
                             SelectedInstallScope
                         );
                     });
@@ -254,7 +292,10 @@ namespace WSMDeployer.ViewModels
 
         private bool CanLoadUsers()
         {
-            return IsPerUser && !IsLoadingUsers && !IsDeploying;
+            // Require credentials before loading users
+            return IsPerUser && !IsLoadingUsers && !IsDeploying &&
+                   !string.IsNullOrWhiteSpace(AdminUsername) &&
+                   !string.IsNullOrWhiteSpace(AdminPassword);
         }
 
         private async void OnLoadUsers()
@@ -266,12 +307,8 @@ namespace WSMDeployer.ViewModels
             {
                 var userService = new UserManagementService();
 
-                // Get credentials (TODO: from credential profile)
-                string username = "Administrator";
-                string password = "Password123";
-
-                // Load users in background
-                var users = await userService.GetNonAdminUsers(_target, username, password);
+                // Load users in background using provided credentials
+                var users = await userService.GetNonAdminUsers(_target, AdminUsername, AdminPassword);
 
                 AvailableUsers.Clear();
                 foreach (var user in users)

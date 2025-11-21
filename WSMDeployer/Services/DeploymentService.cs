@@ -36,12 +36,10 @@ namespace WSMDeployer.Services
         public async Task<Deployment> DeployToTargetAsync(
             Target target,
             string msiPath,
+            string username,
+            string password,
             InstallScope installScope)
         {
-            // Get credentials from target's profile
-            string username = "Administrator"; // TODO: Get from credential profile
-            string password = "Password123";    // TODO: Get from credential profile
-
             var result = await DeployToTarget(target, msiPath, username, password, null, installScope);
 
             // Return the deployment record
@@ -193,12 +191,10 @@ namespace WSMDeployer.Services
         public async Task<Deployment> DeployToTargetPerUser(
             Target target,
             string msiPath,
+            string username,
+            string password,
             List<UserAccount> targetUsers)
         {
-            // Get credentials from target's profile
-            string username = "Administrator"; // TODO: Get from credential profile
-            string password = "Password123";    // TODO: Get from credential profile
-
             // Create deployment record
             var deployment = new Deployment
             {

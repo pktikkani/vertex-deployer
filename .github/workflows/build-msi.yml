@@ -55,7 +55,12 @@ jobs:
       run: |
         Write-Host "Installing WiX Toolset..."
         dotnet tool install --global wix --version 5.0.2
+        dotnet tool install --global WixToolset.Heat --version 5.0.2
         Write-Host "WiX installed successfully"
+
+        Write-Host "Installing WiX UI extension..."
+        wix extension add WixToolset.UI.wixext/5.0.2
+        Write-Host "WiX UI extension installed"
       shell: pwsh
 
     - name: Generate WXS file
