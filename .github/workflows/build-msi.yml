@@ -58,16 +58,6 @@ jobs:
         Write-Host "WiX installed successfully"
       shell: pwsh
 
-    - name: Install WiX UI Extension
-      run: |
-        Write-Host "Adding WiX UI extension v5.0.2..."
-        wix extension add WixToolset.UI.wixext/5.0.2
-        Write-Host "WiX UI extension added successfully"
-
-        Write-Host "`nInstalled extensions:"
-        wix extension list
-      shell: pwsh
-
     - name: Generate WXS file
       run: |
         cd ${{ env.INSTALLER_PATH }}
@@ -83,10 +73,10 @@ jobs:
           New-Item -ItemType Directory -Path "bin" | Out-Null
         }
 
-        Write-Host "Building MSI with WiX UI extension..."
+        Write-Host "Building MSI with WiX UI extension v5.0.2..."
         wix build `
           -arch x64 `
-          -ext WixToolset.UI.wixext `
+          -ext WixToolset.UI.wixext/5.0.2 `
           Product.wxs `
           Generated.wxs `
           -out bin/VertexCentralDeployer.msi
