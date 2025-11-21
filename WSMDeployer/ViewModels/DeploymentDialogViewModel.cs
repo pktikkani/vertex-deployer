@@ -1,5 +1,7 @@
 using System;
+using System.Collections.ObjectModel;
 using System.IO;
+using System.Linq;
 using System.Windows.Input;
 using WSMDeployer.Models;
 using WSMDeployer.Services;
@@ -17,6 +19,8 @@ namespace WSMDeployer.ViewModels
         private InstallScope _selectedInstallScope = InstallScope.SystemWide;
         private bool _isDeploying = false;
         private string _statusMessage = string.Empty;
+        private bool _isLoadingUsers = false;
+        private ObservableCollection<UserAccount> _availableUsers = new ObservableCollection<UserAccount>();
 
         public DeploymentDialogViewModel(DatabaseService db, Target target)
         {
@@ -27,6 +31,7 @@ namespace WSMDeployer.ViewModels
             BrowseMsiCommand = new RelayCommand(OnBrowseMsi);
             DeployCommand = new RelayCommand(OnDeploy, CanDeploy);
             CancelCommand = new RelayCommand(OnCancel);
+            LoadUsersCommand = new RelayCommand(OnLoadUsers, CanLoadUsers);
         }
 
         public event Action? DeploymentStarted;
@@ -73,6 +78,9 @@ namespace WSMDeployer.ViewModels
                 if (value)
                 {
                     SelectedInstallScope = InstallScope.PerUser;
+                    OnPropertyChanged(nameof(IsPerUser));
+                    OnPropertyChanged(nameof(ShowUserSelection));
+                    ((RelayCommand)LoadUsersCommand).RaiseCanExecuteChanged();
                 }
             }
         }
@@ -89,10 +97,37 @@ namespace WSMDeployer.ViewModels
             set => SetProperty(ref _statusMessage, value);
         }
 
+        public bool IsLoadingUsers
+        {
+            get => _isLoadingUsers;
+            set
+            {
+                if (SetProperty(ref _isLoadingUsers, value))
+                {
+                    OnPropertyChanged(nameof(LoadUsersButtonText));
+                }
+            }
+        }
+
+        public ObservableCollection<UserAccount> AvailableUsers
+        {
+            get => _availableUsers;
+            set => SetProperty(ref _availableUsers, value);
+        }
+
+        public bool ShowUserSelection => IsPerUser;
+
+        public bool HasUsers => AvailableUsers.Count > 0;
+
+        public int SelectedUserCount => AvailableUsers.Count(u => u.IsSelected);
+
+        public string LoadUsersButtonText => IsLoadingUsers ? "Loading Users..." : "Load Non-Admin Users from Target";
+
         // Commands
         public ICommand BrowseMsiCommand { get; }
         public ICommand DeployCommand { get; }
         public ICommand CancelCommand { get; }
+        public ICommand LoadUsersCommand { get; }
 
         private async void OnBrowseMsi()
         {
@@ -130,9 +165,18 @@ namespace WSMDeployer.ViewModels
 
         private bool CanDeploy()
         {
-            return !string.IsNullOrWhiteSpace(MsiFilePath) &&
-                   File.Exists(MsiFilePath) &&
-                   !IsDeploying;
+            if (string.IsNullOrWhiteSpace(MsiFilePath) || !File.Exists(MsiFilePath) || IsDeploying)
+            {
+                return false;
+            }
+
+            // If per-user installation, require at least one user selected
+            if (IsPerUser)
+            {
+                return SelectedUserCount > 0;
+            }
+
+            return true;
         }
 
         private async void OnDeploy()
@@ -144,15 +188,46 @@ namespace WSMDeployer.ViewModels
             {
                 var deploymentService = new DeploymentService(_db);
 
-                // Start deployment in background
-                var deployment = await System.Threading.Tasks.Task.Run(async () =>
+                Deployment deployment;
+
+                if (IsPerUser && AvailableUsers.Count > 0)
                 {
-                    return await deploymentService.DeployToTargetAsync(
-                        _target,
-                        MsiFilePath,
-                        SelectedInstallScope
-                    );
-                });
+                    // Per-user deployment with selected users
+                    var selectedUsers = AvailableUsers.Where(u => u.IsSelected).ToList();
+
+                    if (selectedUsers.Count == 0)
+                    {
+                        StatusMessage = "Please select at least one user";
+                        IsDeploying = false;
+                        return;
+                    }
+
+                    StatusMessage = $"Deploying to {selectedUsers.Count} user(s)...";
+
+                    // Start per-user deployment in background
+                    deployment = await System.Threading.Tasks.Task.Run(async () =>
+                    {
+                        return await deploymentService.DeployToTargetPerUser(
+                            _target,
+                            MsiFilePath,
+                            selectedUsers
+                        );
+                    });
+                }
+                else
+                {
+                    // System-wide deployment
+                    StatusMessage = "Deploying system-wide...";
+
+                    deployment = await System.Threading.Tasks.Task.Run(async () =>
+                    {
+                        return await deploymentService.DeployToTargetAsync(
+                            _target,
+                            MsiFilePath,
+                            SelectedInstallScope
+                        );
+                    });
+                }
 
                 if (deployment.Status == DeploymentStatus.Success)
                 {
@@ -174,6 +249,71 @@ namespace WSMDeployer.ViewModels
             {
                 StatusMessage = $"Deployment error: {ex.Message}";
                 IsDeploying = false;
+            }
+        }
+
+        private bool CanLoadUsers()
+        {
+            return IsPerUser && !IsLoadingUsers && !IsDeploying;
+        }
+
+        private async void OnLoadUsers()
+        {
+            IsLoadingUsers = true;
+            StatusMessage = "Loading users from target machine...";
+
+            try
+            {
+                var userService = new UserManagementService();
+
+                // Get credentials (TODO: from credential profile)
+                string username = "Administrator";
+                string password = "Password123";
+
+                // Load users in background
+                var users = await userService.GetNonAdminUsers(_target, username, password);
+
+                AvailableUsers.Clear();
+                foreach (var user in users)
+                {
+                    user.PropertyChanged += (s, e) =>
+                    {
+                        if (e.PropertyName == nameof(UserAccount.IsSelected))
+                        {
+                            OnPropertyChanged(nameof(SelectedUserCount));
+                            ((RelayCommand)DeployCommand).RaiseCanExecuteChanged();
+                        }
+                    };
+                    AvailableUsers.Add(user);
+                }
+
+                OnPropertyChanged(nameof(HasUsers));
+                OnPropertyChanged(nameof(SelectedUserCount));
+                ((RelayCommand)DeployCommand).RaiseCanExecuteChanged();
+
+                if (users.Count == 0)
+                {
+                    StatusMessage = "No non-admin users found on target machine";
+                }
+                else
+                {
+                    StatusMessage = $"Found {users.Count} non-admin user(s)";
+                }
+
+                // Clear status after a delay
+                await System.Threading.Tasks.Task.Delay(3000);
+                StatusMessage = string.Empty;
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Failed to load users: {ex.Message}";
+                await System.Threading.Tasks.Task.Delay(3000);
+                StatusMessage = string.Empty;
+            }
+            finally
+            {
+                IsLoadingUsers = false;
+                ((RelayCommand)LoadUsersCommand).RaiseCanExecuteChanged();
             }
         }
 
