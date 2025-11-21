@@ -1,6 +1,8 @@
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using WSMDeployer.Models;
@@ -168,6 +170,156 @@ namespace WSMDeployer.Services
             catch (Exception ex)
             {
                 log.AppendLine($"Exception occurred: {ex.Message}");
+                return new DeploymentResult
+                {
+                    Success = false,
+                    Method = MethodName,
+                    Error = ex.Message,
+                    Output = log.ToString()
+                };
+            }
+        }
+
+        /// <summary>
+        /// Deploy MSI to specific user accounts on the target machine
+        /// </summary>
+        public async Task<DeploymentResult> DeployPerUser(Target target, string msiPath, string username, string password, List<UserAccount> targetUsers)
+        {
+            var log = new StringBuilder();
+            log.AppendLine($"Starting per-user deployment to {target.Hostname} via PowerShell Remoting");
+            log.AppendLine($"Target users: {string.Join(", ", targetUsers.Select(u => u.Username))}");
+
+            try
+            {
+                // Step 1: Validate MSI exists
+                if (!File.Exists(msiPath))
+                {
+                    return new DeploymentResult
+                    {
+                        Success = false,
+                        Method = MethodName,
+                        Error = $"MSI file not found: {msiPath}"
+                    };
+                }
+
+                if (targetUsers == null || targetUsers.Count == 0)
+                {
+                    return new DeploymentResult
+                    {
+                        Success = false,
+                        Method = MethodName,
+                        Error = "No target users specified for per-user deployment"
+                    };
+                }
+
+                log.AppendLine($"MSI file validated: {msiPath}");
+                var msiFileName = Path.GetFileName(msiPath);
+
+                // Step 2: Copy MSI to target
+                log.AppendLine($"Copying MSI to target...");
+                var remotePath = $"\\\\{target.Hostname}\\C$\\Temp\\{msiFileName}";
+
+                var copyScript = $@"
+                    $secPassword = ConvertTo-SecureString '{password}' -AsPlainText -Force
+                    $credential = New-Object System.Management.Automation.PSCredential('{username}', $secPassword)
+
+                    # Create temp directory if it doesn't exist
+                    Invoke-Command -ComputerName '{target.Hostname}' -Credential $credential -ScriptBlock {{
+                        if (-not (Test-Path 'C:\Temp')) {{
+                            New-Item -ItemType Directory -Path 'C:\Temp' -Force | Out-Null
+                        }}
+                    }}
+
+                    # Copy MSI file
+                    Copy-Item -Path '{msiPath}' -Destination '{remotePath}' -Force
+                ";
+
+                var copyResult = await ExecutePowerShell(copyScript);
+                if (copyResult.ExitCode != 0)
+                {
+                    return new DeploymentResult
+                    {
+                        Success = false,
+                        Method = MethodName,
+                        Error = $"Failed to copy MSI: {copyResult.Error}",
+                        Output = log.ToString()
+                    };
+                }
+
+                log.AppendLine("MSI copied successfully");
+
+                // Step 3: Install for each user
+                var successCount = 0;
+                var failedUsers = new List<string>();
+
+                foreach (var user in targetUsers)
+                {
+                    log.AppendLine($"Installing for user: {user.Username}...");
+
+                    var installScript = $@"
+                        $secPassword = ConvertTo-SecureString '{password}' -AsPlainText -Force
+                        $credential = New-Object System.Management.Automation.PSCredential('{username}', $secPassword)
+
+                        Invoke-Command -ComputerName '{target.Hostname}' -Credential $credential -ScriptBlock {{
+                            param($msiPath, $targetUser)
+
+                            # Load user's registry hive
+                            $userSID = (Get-WmiObject -Class Win32_UserAccount -Filter ""Name='$targetUser'"").SID
+
+                            # Install MSI with ALLUSERS="""" for current user installation
+                            # Set registry to impersonate user
+                            $process = Start-Process -FilePath 'msiexec.exe' -ArgumentList '/i', $msiPath, 'ALLUSERS=""""', '/quiet', '/norestart', '/l*v', ""C:\Temp\vertex_install_$targetUser.log"" -Wait -PassThru
+
+                            return @{{
+                                ExitCode = $process.ExitCode
+                                LogContent = if (Test-Path ""C:\Temp\vertex_install_$targetUser.log"") {{ Get-Content ""C:\Temp\vertex_install_$targetUser.log"" -Tail 20 | Out-String }} else {{ '' }}
+                            }}
+                        }} -ArgumentList 'C:\Temp\{msiFileName}', '{user.Username}'
+                    ";
+
+                    var installResult = await ExecutePowerShell(installScript);
+
+                    if (installResult.ExitCode == 0)
+                    {
+                        log.AppendLine($"✓ Successfully installed for {user.Username}");
+                        successCount++;
+                    }
+                    else
+                    {
+                        log.AppendLine($"✗ Failed to install for {user.Username}: {installResult.Error}");
+                        failedUsers.Add(user.Username);
+                    }
+                }
+
+                log.AppendLine($"Installation complete: {successCount}/{targetUsers.Count} successful");
+
+                // Step 4: Cleanup
+                log.AppendLine("Cleaning up temporary files...");
+                var cleanupScript = $@"
+                    $secPassword = ConvertTo-SecureString '{password}' -AsPlainText -Force
+                    $credential = New-Object System.Management.Automation.PSCredential('{username}', $secPassword)
+
+                    Invoke-Command -ComputerName '{target.Hostname}' -Credential $credential -ScriptBlock {{
+                        Remove-Item -Path 'C:\Temp\{msiFileName}' -Force -ErrorAction SilentlyContinue
+                        Remove-Item -Path 'C:\Temp\vertex_install_*.log' -Force -ErrorAction SilentlyContinue
+                    }}
+                ";
+
+                await ExecutePowerShell(cleanupScript);
+
+                // Return result
+                bool overallSuccess = successCount == targetUsers.Count;
+                return new DeploymentResult
+                {
+                    Success = overallSuccess,
+                    Method = MethodName + " (Per-User)",
+                    Output = log.ToString(),
+                    Error = overallSuccess ? null : $"Failed for users: {string.Join(", ", failedUsers)}"
+                };
+            }
+            catch (Exception ex)
+            {
+                log.AppendLine($"Exception: {ex.Message}");
                 return new DeploymentResult
                 {
                     Success = false,

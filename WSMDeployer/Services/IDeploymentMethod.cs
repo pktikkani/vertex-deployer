@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using WSMDeployer.Models;
 
@@ -37,5 +38,16 @@ namespace WSMDeployer.Services
         /// <param name="password">Password for authentication</param>
         /// <returns>Deployment result with success/failure info</returns>
         Task<DeploymentResult> Deploy(Target target, string msiPath, string username, string password);
+
+        /// <summary>
+        /// Deploy the MSI to specific user accounts on the target machine
+        /// </summary>
+        /// <param name="target">Target machine to deploy to</param>
+        /// <param name="msiPath">Local path to MSI file</param>
+        /// <param name="username">Admin username for authentication</param>
+        /// <param name="password">Admin password for authentication</param>
+        /// <param name="targetUsers">List of user accounts to install for</param>
+        /// <returns>Deployment result with success/failure info</returns>
+        Task<DeploymentResult> DeployPerUser(Target target, string msiPath, string username, string password, List<UserAccount> targetUsers);
     }
 }

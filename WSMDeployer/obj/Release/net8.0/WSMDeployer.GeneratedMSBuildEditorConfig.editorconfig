@@ -36,55 +36,10 @@ build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 [C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/ModernTheme.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/Themes/CatppuccinFrappe.axaml]
+[C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/Themes/Dark.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
-[C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/Themes/CatppuccinLatte.axaml]
-build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
-
-[C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/Themes/CatppuccinMacchiato.axaml]
-build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
-
-[C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/Themes/CatppuccinMocha.axaml]
-build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
-
-[C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/Themes/DraculaDark.axaml]
-build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
-
-[C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/Themes/DraculaLight.axaml]
-build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
-
-[C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/Themes/GruvboxDark.axaml]
-build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
-
-[C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/Themes/GruvboxLight.axaml]
-build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
-
-[C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/Themes/NordDark.axaml]
-build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
-
-[C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/Themes/NordLight.axaml]
-build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
-
-[C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/Themes/OneDark.axaml]
-build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
-
-[C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/Themes/OneLight.axaml]
-build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
-
-[C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/Themes/SolarizedDark.axaml]
-build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
-
-[C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/Themes/SolarizedLight.axaml]
-build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
-
-[C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/Themes/TokyoDay.axaml]
-build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
-
-[C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/Themes/TokyoNight.axaml]
-build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
-
-[C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/Themes/TokyoStorm.axaml]
+[C:/Users/pavan/WSMDeployer/WSMDeployer/Styles/Themes/Light.axaml]
 build_metadata.AdditionalFiles.SourceItemGroup = AvaloniaXaml
 
 [C:/Users/pavan/WSMDeployer/WSMDeployer/Views/DashboardView.axaml]

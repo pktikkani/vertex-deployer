@@ -188,6 +188,91 @@ namespace WSMDeployer.Services
         }
 
         /// <summary>
+        /// Deploy to specific user accounts on a target
+        /// </summary>
+        public async Task<Deployment> DeployToTargetPerUser(
+            Target target,
+            string msiPath,
+            List<UserAccount> targetUsers)
+        {
+            // Get credentials from target's profile
+            string username = "Administrator"; // TODO: Get from credential profile
+            string password = "Password123";    // TODO: Get from credential profile
+
+            // Create deployment record
+            var deployment = new Deployment
+            {
+                TargetId = target.Id,
+                Status = DeploymentStatus.Queued,
+                CreatedDate = DateTime.Now
+            };
+
+            var deploymentId = _db.CreateDeployment(deployment);
+            deployment.Id = deploymentId;
+
+            try
+            {
+                // Update status to in progress
+                deployment.Status = DeploymentStatus.InProgress;
+                deployment.StartTime = DateTime.Now;
+                _db.UpdateDeploymentStatus(deploymentId, DeploymentStatus.InProgress);
+
+                // Update target status
+                target.Status = TargetStatus.Deploying;
+                _db.UpdateTarget(target);
+
+                // Select and execute deployment method for per-user
+                var result = await SelectAndDeployPerUser(target, msiPath, username, password, targetUsers);
+
+                // Update deployment record
+                deployment.Method = result.Method;
+                deployment.EndTime = DateTime.Now;
+                deployment.Log = result.Output;
+
+                if (result.Success)
+                {
+                    deployment.Status = DeploymentStatus.Success;
+                    deployment.ErrorMessage = null;
+
+                    // Update target with success
+                    target.Status = TargetStatus.Online;
+                    target.LastSeen = DateTime.Now;
+                    target.ModifiedDate = DateTime.Now;
+                }
+                else
+                {
+                    deployment.Status = DeploymentStatus.Failed;
+                    deployment.ErrorMessage = result.Error;
+
+                    // Update target with error
+                    target.Status = TargetStatus.Error;
+                    target.ModifiedDate = DateTime.Now;
+                }
+
+                _db.UpdateDeploymentStatus(deploymentId, deployment.Status, deployment.ErrorMessage);
+                _db.UpdateDeploymentLog(deploymentId, deployment.Log ?? string.Empty);
+                _db.UpdateTarget(target);
+
+                return deployment;
+            }
+            catch (Exception ex)
+            {
+                // Handle unexpected errors
+                deployment.Status = DeploymentStatus.Failed;
+                deployment.EndTime = DateTime.Now;
+                deployment.ErrorMessage = $"Unexpected error: {ex.Message}";
+                deployment.Log = ex.StackTrace;
+
+                _db.UpdateDeploymentStatus(deploymentId, DeploymentStatus.Failed, deployment.ErrorMessage);
+
+                target.Status = TargetStatus.Error;
+                _db.UpdateTarget(target);
+
+                return deployment;
+            }
+        }
+
+        /// <summary>
         /// Select the best deployment method and execute deployment
         /// Tries methods in priority order until one succeeds or all fail
         /// </summary>
@@ -237,6 +322,59 @@ namespace WSMDeployer.Services
                 Success = false,
                 Method = "All methods failed",
                 Error = "All deployment methods failed",
+                Output = string.Join("\n", errors)
+            };
+        }
+
+        /// <summary>
+        /// Select the best deployment method and execute per-user deployment
+        /// </summary>
+        private async Task<DeploymentResult> SelectAndDeployPerUser(
+            Target target,
+            string msiPath,
+            string username,
+            string password,
+            List<UserAccount> targetUsers)
+        {
+            var errors = new List<string>();
+
+            // Try each deployment method in priority order
+            foreach (var method in _deploymentMethods)
+            {
+                try
+                {
+                    // Check if this method can deploy to the target
+                    var canDeploy = await method.CanDeploy(target, username, password);
+
+                    if (!canDeploy)
+                    {
+                        errors.Add($"{method.MethodName}: Not available or connectivity test failed");
+                        continue;
+                    }
+
+                    // Attempt per-user deployment
+                    var result = await method.DeployPerUser(target, msiPath, username, password, targetUsers);
+
+                    if (result.Success)
+                    {
+                        return result;
+                    }
+
+                    // Method failed, try next one
+                    errors.Add($"{method.MethodName}: {result.Error}");
+                }
+                catch (Exception ex)
+                {
+                    errors.Add($"{method.MethodName}: Exception - {ex.Message}");
+                }
+            }
+
+            // All methods failed
+            return new DeploymentResult
+            {
+                Success = false,
+                Method = "All methods failed",
+                Error = "All deployment methods failed for per-user installation",
                 Output = string.Join("\n", errors)
             };
         }

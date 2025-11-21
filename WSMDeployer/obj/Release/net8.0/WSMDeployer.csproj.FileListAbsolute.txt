@@ -101,3 +101,4 @@ C:\Users\pavan\WSMDeployer\WSMDeployer\obj\Release\net8.0\WSMDeployer.pdb
 C:\Users\pavan\WSMDeployer\WSMDeployer\obj\Release\net8.0\WSMDeployer.genruntimeconfig.cache
 C:\Users\pavan\WSMDeployer\WSMDeployer\obj\Release\net8.0\ref\WSMDeployer.dll
 C:\Users\pavan\WSMDeployer\WSMDeployer\bin\Release\net8.0\System.Security.Cryptography.ProtectedData.dll
+C:\Users\pavan\WSMDeployer\WSMDeployer\obj\Release\net8.0\WSMDeployer.sourcelink.json

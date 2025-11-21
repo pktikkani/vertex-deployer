@@ -61,7 +61,7 @@ jobs:
     - name: Generate WXS file
       run: |
         cd ${{ env.INSTALLER_PATH }}
-        powershell -ExecutionPolicy Bypass -File GenerateWXS.ps1
+        powershell -ExecutionPolicy Bypass -File GenerateWXS.ps1 -SourceDir "../WSMDeployer/bin/Release/net8.0/win-x64/publish"
       shell: pwsh
 
     - name: Build MSI

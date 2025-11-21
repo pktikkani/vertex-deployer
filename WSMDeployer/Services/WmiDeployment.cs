@@ -1,5 +1,7 @@
 using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Management;
 using System.Text;
 using System.Threading.Tasks;
@@ -245,6 +247,168 @@ namespace WSMDeployer.Services
             }
 
             return false; // Timeout
+        }
+
+        /// <summary>
+        /// Deploy MSI to specific user accounts on the target machine
+        /// </summary>
+        public async Task<DeploymentResult> DeployPerUser(Target target, string msiPath, string username, string password, List<UserAccount> targetUsers)
+        {
+            return await Task.Run(() =>
+            {
+                var log = new StringBuilder();
+                log.AppendLine($"Starting per-user deployment to {target.Hostname} via WMI");
+                log.AppendLine($"Target users: {string.Join(", ", targetUsers.Select(u => u.Username))}");
+
+                try
+                {
+                    // Step 1: Validate MSI exists
+                    if (!File.Exists(msiPath))
+                    {
+                        return new DeploymentResult
+                        {
+                            Success = false,
+                            Method = MethodName,
+                            Error = $"MSI file not found: {msiPath}"
+                        };
+                    }
+
+                    if (targetUsers == null || targetUsers.Count == 0)
+                    {
+                        return new DeploymentResult
+                        {
+                            Success = false,
+                            Method = MethodName,
+                            Error = "No target users specified for per-user deployment"
+                        };
+                    }
+
+                    log.AppendLine($"MSI file validated: {msiPath}");
+                    var msiFileName = Path.GetFileName(msiPath);
+
+                    // Step 2: Setup WMI connection
+                    var options = new ConnectionOptions
+                    {
+                        Username = username,
+                        Password = password,
+                        Impersonation = ImpersonationLevel.Impersonate,
+                        Authentication = AuthenticationLevel.PacketPrivacy
+                    };
+
+                    var scope = new ManagementScope($"\\\\{target.Hostname}\\root\\cimv2", options);
+                    scope.Connect();
+
+                    if (!scope.IsConnected)
+                    {
+                        return new DeploymentResult
+                        {
+                            Success = false,
+                            Method = MethodName,
+                            Error = "Failed to connect to target via WMI"
+                        };
+                    }
+
+                    log.AppendLine("WMI connection established");
+
+                    // Step 3: Copy MSI to target via SMB
+                    log.AppendLine("Copying MSI to target...");
+                    var remoteTempPath = $"\\\\{target.Hostname}\\C$\\Temp";
+
+                    if (!Directory.Exists(remoteTempPath))
+                    {
+                        Directory.CreateDirectory(remoteTempPath);
+                    }
+
+                    var remoteFilePath = Path.Combine(remoteTempPath, msiFileName);
+                    File.Copy(msiPath, remoteFilePath, true);
+                    log.AppendLine("MSI copied successfully");
+
+                    // Step 4: Install for each user
+                    var successCount = 0;
+                    var failedUsers = new List<string>();
+
+                    foreach (var user in targetUsers)
+                    {
+                        log.AppendLine($"Installing for user: {user.Username}...");
+
+                        var processClass = new ManagementClass(scope, new ManagementPath("Win32_Process"), null);
+                        var inParams = processClass.GetMethodParameters("Create");
+
+                        // Build msiexec command for per-user installation
+                        // ALLUSERS="" means install for current user only
+                        var commandLine = $"msiexec.exe /i C:\\Temp\\{msiFileName} ALLUSERS=\"\" /quiet /norestart /l*v C:\\Temp\\vertex_install_{user.Username}.log";
+                        inParams["CommandLine"] = commandLine;
+
+                        // Execute the process
+                        var outParams = processClass.InvokeMethod("Create", inParams, null);
+
+                        var returnValue = (uint)outParams["returnValue"];
+                        var processId = (uint)outParams["processId"];
+
+                        if (returnValue != 0)
+                        {
+                            log.AppendLine($"✗ Failed to start installation for {user.Username}. Return value: {returnValue}");
+                            failedUsers.Add(user.Username);
+                            continue;
+                        }
+
+                        log.AppendLine($"Installation process started for {user.Username} (PID: {processId})");
+
+                        // Wait for process to complete
+                        var completed = WaitForProcess(scope, processId, TimeSpan.FromMinutes(10));
+
+                        if (!completed)
+                        {
+                            log.AppendLine($"✗ Installation timeout for {user.Username}");
+                            failedUsers.Add(user.Username);
+                        }
+                        else
+                        {
+                            log.AppendLine($"✓ Successfully installed for {user.Username}");
+                            successCount++;
+                        }
+                    }
+
+                    log.AppendLine($"Installation complete: {successCount}/{targetUsers.Count} successful");
+
+                    // Step 5: Cleanup
+                    log.AppendLine("Cleaning up temporary files...");
+                    try
+                    {
+                        File.Delete(remoteFilePath);
+                        var logFiles = Directory.GetFiles(remoteTempPath, "vertex_install_*.log");
+                        foreach (var logFile in logFiles)
+                        {
+                            File.Delete(logFile);
+                        }
+                    }
+                    catch (Exception cleanupEx)
+                    {
+                        log.AppendLine($"Cleanup warning: {cleanupEx.Message}");
+                    }
+
+                    // Return result
+                    bool overallSuccess = successCount == targetUsers.Count;
+                    return new DeploymentResult
+                    {
+                        Success = overallSuccess,
+                        Method = MethodName + " (Per-User)",
+                        Output = log.ToString(),
+                        Error = overallSuccess ? null : $"Failed for users: {string.Join(", ", failedUsers)}"
+                    };
+                }
+                catch (Exception ex)
+                {
+                    log.AppendLine($"Exception: {ex.Message}");
+                    return new DeploymentResult
+                    {
+                        Success = false,
+                        Method = MethodName,
+                        Error = ex.Message,
+                        Output = log.ToString()
+                    };
+                }
+            });
         }
 
         /// <summary>
