@@ -19,7 +19,7 @@
     <Property Id="WIXUI_INSTALLDIR" Value="INSTALLFOLDER" />
 
     <!-- License -->
-    <WixVariable Id="WixUILicenseRtf" Value="License.rtf" />
+    <WixVariable Id="WixUILicenseRtf" Value="$(var.ProjectDir)\License.rtf" />
 
     <!-- Features -->
     <Feature Id="MainFeature" Title="Vertex Central Deployer" Level="1">

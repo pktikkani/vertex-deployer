@@ -110,6 +110,7 @@ try {
         "$scriptDir\Product.wxs"
         "$scriptDir\Generated.wxs"
         "-d", "DeployerDir=$publishDir"
+        "-d", "ProjectDir=$scriptDir"
         "-v"
     )
 
