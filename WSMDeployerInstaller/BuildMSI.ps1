@@ -36,9 +36,8 @@ try {
         "$projectDir\WSMDeployer.csproj"
         "-c", $Configuration
         "-r", "win-$Platform"
-        "--self-contained", "true"
+        "--self-contained", "false"
         "-p:PublishSingleFile=false"
-        "-p:PublishReadyToRun=false"
         "-o", $publishDir
     )
 
